@@ -1,15 +1,15 @@
 CLIENT: CODE_CLIENT, raison_sociale, siret, contact_nom, contact_email, adresse, status
 possede, 0N CLIENT, 11 ARTICLE
-ARTICLE: CODE_CLIENT, REFERENCE, libelle, poids, longueur, largeur, hauteur, fournisseur
-deplace_par, 0N ARTICLE, 11 MOUVEMENT
+ARTICLE: CODE_CLIENT, _REFERENCE, libelle, poids, longueur, largeur, hauteur, fournisseur
+concerne, 0N ARTICLE, 11 MOUVEMENT
 
-stocke_dans, 0N ARTICLE, 11 STOCK
+stockage, 0N ARTICLE, 11 STOCK, 0N EMPLACEMENT
 :
 :
 MOUVEMENT: NUMERO_MVT, type_mouvement, quantite, date_mouvement
 
+:
 STOCK: ID_STOCK, quantite, date_maj
-porte, 0N EMPLACEMENT, 11 STOCK
 depart, 0N EMPLACEMENT, 01 MOUVEMENT
 effectue, 0N UTILISATEUR, 11 MOUVEMENT
 
@@ -25,5 +25,3 @@ contient, 1N SITE, 11 EMPLACEMENT
 
 :
 SITE: CODE_SITE, nom, adresse
-:
-:

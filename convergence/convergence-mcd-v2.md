@@ -2,8 +2,8 @@
 livrable: "01 — Architecture technique"
 scope: "01-architecture"
 section: "Convergence MCD V2 — synthèse"
-version: "1.4-final"
-status: "10/10 convergés — V3 baseline validée"
+version: "1.5-final"
+status: "10/10 convergés — V3 matérialisée dans wms-mcd.md"
 owner: "Ianis"
 participants: ["Claude Code", "GPT-5 Codex"]
 arbitre: "Ianis"
@@ -26,7 +26,7 @@ updated: "2026-05-21"
 
 **10/10 convergés.** Arbitrages Ianis tranchés le 2026-05-21 (points 9 et 10).
 
-V3-GPT ([`../propositions/wms-mcd-v3-gpt.md`](../propositions/wms-mcd-v3-gpt.md)) reste la baseline officielle — elle intègre les 8 consensus et applique déjà l'option D du point 10.
+La proposition V3-GPT ([`../propositions/wms-mcd-v3-gpt.md`](../propositions/wms-mcd-v3-gpt.md)) a été promue dans le MCD officiel racine : [`../wms-mcd.md`](../wms-mcd.md).
 
 ## Décisions consensuelles (8)
 
@@ -39,7 +39,7 @@ V3-GPT ([`../propositions/wms-mcd-v3-gpt.md`](../propositions/wms-mcd-v3-gpt.md)
 | 7 | TRANSFERT inter-site | Intra-site uniquement. Inter-site = 2 mouvements distincts | CHECK DDL `depart.site = arrivee.site` |
 | 8 | Autonomie doc V3 | Recopier le tableau des 7 entités, pas de renvoi à wms-mcd.md | Tableau §3.1 complet |
 | 2 | Rattachement MOUVEMENT-SITE | Pas d'association directe `rattache` par défaut. Site dérivé via `depart` ou `arrivee` | Règle documentée §3.4 |
-| 9-bis | Liens cassés | `*[fichier prévu]*` à côté des liens vers `wms-mld.md`, `wms-ddl.sql`, `DECISIONS.md` | Tous les liens |
+| 9-bis | Liens cassés | Références absentes retirées du MCD officiel ; MLD/DDL restent listés comme livrables à reprendre | `wms-mcd.md` + README |
 
 ## Arbitrages Ianis (tranchés 2026-05-21)
 
@@ -60,7 +60,7 @@ V3-GPT ([`../propositions/wms-mcd-v3-gpt.md`](../propositions/wms-mcd-v3-gpt.md)
 
 Recos écartées : A (faible), B (triggers à maintenir), C (JOIN systématique pénalisant le reporting).
 
-## Spec V3 finale (à matérialiser dans `wms-mcd.md`)
+## Spec V3 finale matérialisée dans `wms-mcd.md`
 
 ### Entités (7)
 
@@ -86,21 +86,19 @@ Recos écartées : A (faible), B (triggers à maintenir), C (JOIN systématique 
 | `depart` | binaire | EMPLACEMENT — MOUVEMENT | (0,N) — (0,1) |
 | `arrivee` | binaire | EMPLACEMENT — MOUVEMENT | (0,N) — (0,1) |
 
-*(si arbitrage point 9 = Oui, ajouter `rattache SITE-MOUVEMENT (0,N) — (1,1)`)*
-
 ### Contraintes MLD/DDL clés
 
 - `ARTICLE` : `UNIQUE(id_client, reference)` (multi-tenant article)
 - `STOCK` : `UNIQUE(id_article, id_emplacement)` (1 ligne par couple)
 - `MOUVEMENT` : `CHECK ck_mvt_src_dst` selon `type_mouvement` (ENTREE/SORTIE/TRANSFERT/AJUSTEMENT)
 - `MOUVEMENT` : `CHECK ck_transfert_intra_site` pour TRANSFERT → `depart.site = arrivee.site`
-- **Séparation client** : selon arbitrage point 10 (option A/B/C/D)
+- **Séparation client** : option D, FK composite `(id_article, id_client) REFERENCES articles(id_article, id_client)`
 
-## Prochaine étape
+## Suites
 
-1. **Ianis** : arbitrer points 9 et 10 (ou confirmer le choix implicite du README = pas de rattache + option D FK composite)
-2. **Claude/GPT** : promouvoir `propositions/wms-mcd-v3-gpt.md` (ou variante post-arbitrage) en `wms-mcd.md` officiel à la racine
-3. **Cleanup** : déplacer `propositions/wms-mcd-v2-*` et l'ancien `wms-mcd.md` v0.8 dans `archive/`
+1. Reprendre le MLD à partir de [`../wms-mcd.md`](../wms-mcd.md).
+2. Reprendre le DDL MariaDB 11.4 LTS avec les contraintes option D.
+3. Archiver les propositions V2 si l'équipe veut alléger le dossier de rendu.
 
 ## Historique complet
 

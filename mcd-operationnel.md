@@ -1,9 +1,9 @@
 ---
 livrable: "01 — Architecture technique"
 scope: "01-architecture"
-section: "MCD opérationnel — slide soutenance V3-GPT"
-version: "3.0-gpt"
-status: "draft"
+section: "MCD opérationnel — slide soutenance V3 officielle"
+version: "3.1-final"
+status: "valide"
 owner: "Ianis"
 reviewers: ["Blaise", "Zaid", "Ojvind"]
 contributors: ["Ianis"]
@@ -11,14 +11,15 @@ ia_used: ["GPT-5 Codex"]
 created: "2026-05-20"
 updated: "2026-05-21"
 related:
-  - "./wms-mcd-v3-gpt.md"
+  - "./wms-mcd.md"
+  - "./wms-mcd.png"
 ---
 
-# MCD opérationnel — slide soutenance V3-GPT
+# MCD opérationnel — slide soutenance V3 officielle
 
-> Version compacte 1-page pour la soutenance. Le MCD détaillé avec justifications est dans [`wms-mcd-v3-gpt.md`](wms-mcd-v3-gpt.md).
+> Version compacte 1-page pour la soutenance. Le MCD détaillé avec justifications est dans [`wms-mcd.md`](wms-mcd.md).
 
-## V3-GPT — 7 entités
+## V3 officielle — 7 entités
 
 ```mermaid
 erDiagram
@@ -49,6 +50,6 @@ erDiagram
 3. **1 journal** : MOUVEMENT = trace append-only, horodatée, site dérivé via `depart`/`arrivee`.
 4. **Séparation client** : `ARTICLE (CODE_CLIENT, REFERENCE)` puis FK composite `(id_article, id_client)` au MLD/DDL.
 
-## Évolutions au-delà de V3-GPT
+## Évolutions au-delà de V3
 
-Voir [`../ROADMAP.md`](../ROADMAP.md) — évolutions hiérarchisées par valeur métier (lots/FEFO, cycle commande, code-barres, réservation stock, fournisseurs entité).
+Évolutions hiérarchisées par valeur métier : lots/FEFO, cycle commande, code-barres, réservation stock, fournisseurs entité.
