@@ -1,8 +1,8 @@
 ---
 livrable: "01 — Architecture technique"
 scope: "01-architecture"
-section: "DDL MariaDB 11.4"
-version: "1.0"
+section: "DDL MariaDB 11.4 — V2"
+version: "2.0"
 status: "à tester"
 owner: "Ianis"
 created: "2026-05-22"
@@ -13,9 +13,9 @@ related:
   - "../mcd/wms-mcd.md"
 ---
 
-# DDL WMS — MariaDB 11.4
+# DDL WMS — V2 MariaDB 11.4
 
-> Implémentation SQL du MLD simplifié. Script unique : [`wms-schema.sql`](wms-schema.sql).
+> Implémentation SQL du MLD V2 (5 fixes MCD appliqués). Script unique : [`wms-schema.sql`](wms-schema.sql).
 
 ## 1. Cible technique
 
@@ -27,7 +27,18 @@ related:
 | Collation | `utf8mb4_unicode_ci` |
 | Contraintes CHECK | Supportées nativement depuis MariaDB 10.2 |
 
-## 2. Ordre de création
+## 2. Changements vs V1
+
+| # | Élément | V1 | V2 |
+|---|---|---|---|
+| 1 | Nombre de tables | 9 (incl. `article_stock`) | **8** (`article_stock` supprimée) |
+| 2 | FK `stock.id_article` | absente | **NOT NULL** (nouveau) |
+| 3 | UNIQUE `stock(id_article, id_localisation)` | absent | **présent** (1 ligne de stock par couple article × emplacement) |
+| 4 | `mouvement.id_stock` | NULL, ON DELETE SET NULL | **NOT NULL**, ON DELETE RESTRICT |
+| 5 | `mouvement.quantite` | absente | **NOT NULL**, CHECK > 0 |
+| 6 | `mouvement.id_client` | absente | **NULL**, ON DELETE RESTRICT |
+
+## 3. Ordre de création
 
 L'ordre est imposé par les dépendances FK :
 
@@ -36,113 +47,104 @@ L'ordre est imposé par les dépendances FK :
 3. `utilisateur` (racine)
 4. `client` → FK `utilisateur`
 5. `article` (racine)
-6. `stock` → FK `localisation`
-7. `mouvement` → FK `stock`, `utilisateur`
+6. `stock` → FK `article`, `localisation`
+7. `mouvement` → FK `stock`, `utilisateur`, `client`
 8. `commande` (associative) → FK `client`, `article`
-9. `article_stock` (associative) → FK `article`, `stock`
 
-Le script utilise `SET FOREIGN_KEY_CHECKS = 0` pour le DROP préliminaire afin de pouvoir purger dans n'importe quel ordre.
+## 4. Contraintes appliquées
 
-## 3. Contraintes appliquées
+### 4.1 Clés primaires
+Toutes auto-incrémentées `INT UNSIGNED`.
 
-### 3.1 Clés primaires
-Toutes auto-incrémentées `INT UNSIGNED` sauf `article_stock` (PK composite `(id_article, id_stock)`).
-
-### 3.2 Clés étrangères
+### 4.2 Clés étrangères
 
 | Table | Colonne | Référence | ON DELETE | Raison |
 |---|---|---|---|---|
-| `localisation` | `id_site` | `site(id_site)` | RESTRICT | Refus suppression d'un site avec localisations |
-| `client` | `id_utilisateur` | `utilisateur(id_utilisateur)` | RESTRICT | Un gestionnaire ne peut être supprimé s'il a des clients |
+| `localisation` | `id_site` | `site(id_site)` | RESTRICT | Refus suppression site avec localisations |
+| `client` | `id_utilisateur` | `utilisateur(id_utilisateur)` | RESTRICT | Gestionnaire ne peut être supprimé s'il a des clients |
+| `stock` | `id_article` | `article(id_article)` | RESTRICT | Refus suppression article tant qu'il a du stock |
 | `stock` | `id_localisation` | `localisation(id_localisation)` | RESTRICT | Pas de stock orphelin |
-| `mouvement` | `id_stock` | `stock(id_stock)` | SET NULL | Si stock supprimé, l'historique des mouvements reste (traçabilité) |
+| `mouvement` | `id_stock` | `stock(id_stock)` | RESTRICT | Traçabilité — un stock avec mouvements ne peut être supprimé |
 | `mouvement` | `id_utilisateur` | `utilisateur(id_utilisateur)` | RESTRICT | Traçabilité humaine obligatoire |
+| `mouvement` | `id_client` | `client(id_client)` | RESTRICT | Si client supprimé, refus tant que mouvements existent |
 | `commande` | `id_client`, `id_article` | client / article | RESTRICT | Protection métier |
-| `article_stock` | `id_article`, `id_stock` | article / stock | CASCADE | Lien d'association : se purge avec les entités liées |
 
-### 3.3 Contraintes UNIQUE
+### 4.3 Contraintes UNIQUE
 
 | Table | Colonne(s) | Justification |
 |---|---|---|
 | `localisation` | `code` | Code physique unique d'emplacement |
 | `client` | `siret` | Identifiant légal unique |
 | `mouvement` | `reference` | Numéro de traçabilité métier |
+| `stock` | `(id_article, id_localisation)` | **V2** : pas deux lignes de stock pour le même couple article × emplacement |
 
-### 3.4 Contraintes CHECK
+### 4.4 Contraintes CHECK
 
 | Table | Nom | Règle |
 |---|---|---|
 | `article` | `ck_article_poids` | `poids > 0` |
 | `commande` | `ck_commande_quantite` | `quantite_commandee > 0` |
 | `mouvement` | `ck_mouvement_type` | `type IN ('entree','sortie','ajustement','transfert')` |
+| `mouvement` | `ck_mouvement_quantite` | **V2** : `quantite > 0` |
 
-## 4. Index secondaires
-
-Tous les index FK sont créés explicitement (MariaDB les crée automatiquement avec une FK mais on les nomme pour cohérence et maintenance) :
+## 5. Index secondaires
 
 - `idx_localisation_site`
 - `idx_client_utilisateur`
+- `idx_stock_article` ★ V2
 - `idx_stock_localisation`
-- `idx_mouvement_date` ← reporting journalier
+- `idx_mouvement_date`
 - `idx_mouvement_stock`
 - `idx_mouvement_utilisateur`
+- `idx_mouvement_client` ★ V2
 - `idx_commande_client`
 - `idx_commande_article`
-- `idx_article_stock_stock`
 
-## 5. Exécution
+## 6. Exécution
 
 ```bash
-# Connexion MariaDB
 mysql -h <host> -u <user> -p
 
-# Création de la base
 CREATE DATABASE wms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE wms;
 
-# Exécution du script
 SOURCE 01-architecture-technique/ddl/wms-schema.sql;
 
-# Vérification
 SHOW TABLES;
--- Attendu : 9 tables
---   article, article_stock, client, commande, localisation,
---   mouvement, site, stock, utilisateur
+-- Attendu : 8 tables (V2)
+--   article, client, commande, localisation, mouvement, site, stock, utilisateur
 ```
 
-## 6. Vérifications post-exécution
+## 7. Vérifications post-exécution
 
 ```sql
--- Compter les tables (attendu : 9)
+-- Compter les tables (attendu : 8)
 SELECT COUNT(*) AS nb_tables
 FROM information_schema.tables
 WHERE table_schema = 'wms';
 
--- Vérifier les FK (attendu : 9 contraintes FK)
+-- Vérifier les FK (attendu : 10 contraintes FK)
 SELECT COUNT(*) AS nb_fk
 FROM information_schema.referential_constraints
 WHERE constraint_schema = 'wms';
 
--- Vérifier les CHECK (attendu : 3)
+-- Vérifier les CHECK (attendu : 4)
 SELECT COUNT(*) AS nb_check
 FROM information_schema.check_constraints
 WHERE constraint_schema = 'wms';
 ```
 
-## 7. Écarts vs MCD strict
-
-| Élément | MCD | DDL | Raison |
-|---|---|---|---|
-| `mouvement.id_stock` | UNIQUE (cardinalité 0,1 côté STOCK) | NON-UNIQUE | Permet l'historique de mouvements sur un même stock |
-| `article_stock` | Association pure N-N | Table avec attribut `date_ajout` | Traçabilité des affectations |
-| Accents attributs | `quantité`, `allée`, `étage` | `quantite`, `allee`, `etage` | Compat ASCII / scripts portables |
-
 ## 8. Statut tests
 
-À ce stade le script n'a **pas encore** été exécuté sur MariaDB 11.4. À faire :
+À ce stade le script V2 n'a **pas encore** été exécuté sur MariaDB 11.4. À faire :
 
 - [ ] Exécution sur instance MariaDB 11.4 locale
-- [ ] Vérification des 3 CHECK (insérer poids=0, qté=0, type='foo' → doit échouer)
-- [ ] Vérification des FK (insérer FK invalide → doit échouer)
-- [ ] Test ON DELETE RESTRICT (tenter delete d'un site avec localisation → doit échouer)
-- [ ] Test ON DELETE SET NULL sur `mouvement.id_stock` (supprimer stock → mouvement.id_stock devient NULL)
+- [ ] Vérification des 4 CHECK (insérer poids=0, qté_cmd=0, type='foo', qté_mvt=0 → doit échouer)
+- [ ] Vérification des 10 FK (insérer FK invalide → doit échouer)
+- [ ] Test UNIQUE `stock(id_article, id_localisation)` (2 lignes même couple → doit échouer)
+- [ ] Test ON DELETE RESTRICT sur `mouvement.id_stock` (supprimer stock avec mouvement → doit échouer)
+- [ ] Test NULL autorisé sur `mouvement.id_client` (insertion mouvement de type 'transfert' sans client → doit passer)
+
+## 9. Écarts V2 vs MCD strict
+
+Aucun. Le MCD V2 et le DDL V2 sont alignés (la divergence V1 sur la cardinalité `EFFECTUER` n'a plus lieu d'être : le MCD a été corrigé en `(0,N)` côté STOCK).

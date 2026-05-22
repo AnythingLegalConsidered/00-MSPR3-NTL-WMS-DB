@@ -1,67 +1,91 @@
 ---
 livrable: "01 — Architecture technique"
 scope: "01-architecture"
-section: "MCD WMS simplifié"
-version: "1.0"
+section: "MCD WMS — version 2 (corrigée grossiste)"
+version: "2.0"
 status: "valide"
 owner: "Ianis"
 created: "2026-05-22"
 updated: "2026-05-22"
 related:
   - "./wms-mcd.png"
+  - "./wms-mcd.mcd"
   - "../mld/wms-mld.md"
-  - "../ddl/wms-ddl.md"
+  - "../ddl/wms-schema.sql"
 ---
 
-# MCD WMS — version simplifiée
+# MCD WMS — V2
 
-> Remplace la V4 du 2026-05-21 (archivée dans [`99-archive/01-architecture-technique-v1/`](../../99-archive/01-architecture-technique-v1/)). Choix d'un modèle compact (7 entités, 7 associations) pour la défense soutenance.
+> Remplace la V1 du 2026-05-22. **5 corrections** appliquées suite à arbitrage métier (NTL = grossiste) et revue critique. Source de vérité graphique : [`wms-mcd.png`](wms-mcd.png), source Mocodo : [`wms-mcd.mcd`](wms-mcd.mcd).
 
-Le schéma graphique de référence est `wms-mcd.png` (à déposer manuellement dans ce dossier).
+## 1. Postulat métier
 
-## 1. Entités (7)
+NTL est un **grossiste** : achète à des fournisseurs, stocke pour son propre compte sur 4 sites, revend à des clients. Tous les biens stockés sont propriété NTL. Voir [`decisions/0003-postulats-cadrage-ntl.md`](../../decisions/0003-postulats-cadrage-ntl.md) (à venir).
+
+## 2. Diagramme
+
+![MCD WMS V2](wms-mcd.png)
+
+## 3. Entités (7)
 
 | # | Entité | Identifiant | Attributs |
 |---|---|---|---|
 | 1 | `ARTICLE` | `id_article` | `nom`, `poids`, `fournisseur`, `type` |
 | 2 | `CLIENT` | `id_client` | `nom`, `siret`, `telephone`, `status` |
-| 3 | `STOCK` | `id_stock` | `quantité` |
-| 4 | `LOCALISATION` | `id_localisation` | `code`, `zone`, `allée`, `étage`, `place` |
+| 3 | `STOCK` | `id_stock` | `quantite` |
+| 4 | `LOCALISATION` | `id_localisation` | `code`, `zone`, `allee`, `etage`, `place` |
 | 5 | `SITE` | `id_site` | `libelle`, `adresse` |
 | 6 | `UTILISATEUR` | `id_utilisateur` | `nom`, `role` |
-| 7 | `MOUVEMENT` | `id_mouvement` | `type`, `reference`, `date`, `heure` |
+| 7 | `MOUVEMENT` | `id_mouvement` | `type`, `reference`, `date`, `heure`, **`quantite`** ★ |
 
-## 2. Associations (7)
+## 4. Associations (8)
 
-| Association | Entité A | Card. A | Entité B | Card. B | Nature |
-|---|---|---|---|---|---|
-| `COMMANDE` | CLIENT | 0,N | ARTICLE | 1,N | N-N (table associative) |
-| `CONTENIR` (article–stock) | ARTICLE | 1,N | STOCK | 0,N | N-N (table associative) |
-| `CONTENIR` (stock–localisation) | STOCK | 1,1 | LOCALISATION | 1,N | 1-N (FK côté STOCK) |
-| `CONTENIR` (localisation–site) | LOCALISATION | 1,1 | SITE | 1,N | 1-N (FK côté LOCALISATION) |
-| `ECHANGER` | CLIENT | 1,1 | UTILISATEUR | 1,N | 1-N (FK côté CLIENT) |
-| `EFFECTUER` | STOCK | 0,1 | MOUVEMENT | 1,1 | 1-N pragmatique (FK côté MOUVEMENT) — voir §3 |
-| `REALISER` | UTILISATEUR | 0,N | MOUVEMENT | 1,1 | 1-N (FK côté MOUVEMENT) |
+| Association | Entité A | Card. A | Entité B | Card. B |
+|---|---|---|---|---|
+| `COMMANDE` | CLIENT | (0,N) | ARTICLE | **(0,N)** ★ |
+| `CONTENIR_AS` (article-stock) | ARTICLE | (1,N) | STOCK | **(1,1)** ★ |
+| `CONTENIR_SL` (stock-loc) | STOCK | (1,1) | LOCALISATION | (1,N) |
+| `CONTENIR_LS` (loc-site) | LOCALISATION | (1,1) | SITE | (1,N) |
+| `EFFECTUER` | STOCK | **(0,N)** ★ | MOUVEMENT | (1,1) |
+| `REALISER` | UTILISATEUR | (0,N) | MOUVEMENT | (1,1) |
+| `ECHANGER` | CLIENT | (1,1) | UTILISATEUR | (1,N) |
+| **`CONCERNE`** ★ | MOUVEMENT | (0,1) | CLIENT | (0,N) |
 
-## 3. Écarts d'interprétation pour le passage au MLD
+Attributs sur associations :
+- `COMMANDE` : `quantite_commandee`, `date_commande`
 
-Deux cardinalités du MCD posent des contraintes peu réalistes en production. Choix retenus pour le DDL :
+## 5. Les 5 corrections appliquées vs V1
 
-| Association MCD | Lecture stricte | Choix MLD/DDL | Justification |
-|---|---|---|---|
-| `EFFECTUER` STOCK (0,1) — MOUVEMENT (1,1) | Un stock ne peut être impacté que par 1 mouvement (toute sa vie) | FK `id_stock` non-UNIQUE dans `mouvement` | Un stock subit N mouvements (entrée, sortie, ajustement…). Strict UNIQUE bloquerait toute traçabilité. |
-| `CONTENIR` ARTICLE (1,N) — STOCK (0,N) | N-N classique | Table associative `article_stock` avec `date_ajout` | Permet historiser quand un article a été rattaché à un emplacement de stock. |
+| ★ | Endroit | Avant V1 | Après V2 | Justification |
+|---|---|---|---|---|
+| 1 | `EFFECTUER` côté STOCK | (0,1) | **(0,N)** | Une ligne de stock subit plusieurs mouvements dans sa vie (entrée + sortie + ajustement + transfert). Le (0,1) précédent interdisait toute traçabilité après le 1er événement. |
+| 2 | `CONTENIR_AS` côté STOCK | (0,N) | **(1,1)** | Un stock = 1 article × 1 emplacement × 1 quantité. Modèle propre : "il y a N unités de l'article A à l'emplacement E". Évite la quantité ambiguë sur stock multi-articles. |
+| 3 | Nouvelle association `CONCERNE` MOUVEMENT-CLIENT | — | `MOUVEMENT (0,1) — (0,N) CLIENT` | Permet de répondre à *"qu'a-t-on expédié à tel client ?"*. (0,1) côté MOUVEMENT car les transferts internes n'ont pas de client. |
+| 4 | `COMMANDE` côté ARTICLE | (1,N) | **(0,N)** | Un article peut être référencé au catalogue avant d'avoir été commandé par un client. |
+| 5 | Attribut `quantite` sur MOUVEMENT | absent | présent (`INT > 0`) | Permet de reconstituer un solde par cumul. La valeur est positive ; le sens (entrée/sortie) est porté par l'attribut `type`. |
 
-Ces écarts sont signalés au jury à l'oral : MCD = vision conceptuelle métier, MLD = vision implémentable.
+## 6. Règles de gestion appliquées
 
-## 4. Règles de gestion appliquées
+- **RG1** : Un article référencé au catalogue peut exister sans stock physique ni commande (cas neuf produit).
+- **RG2** : Un stock = exactement 1 article × 1 emplacement × 1 quantité (option A trancée le 2026-05-22).
+- **RG3** : Un mouvement concerne **exactement 1** stock et **0 ou 1** client (transferts internes = sans client).
+- **RG4** : Chaque client est géré par exactement 1 utilisateur (gestionnaire de compte unique).
+- **RG5** : Tout mouvement est tracé par exactement 1 utilisateur (responsabilité opérationnelle).
+- **RG6** : La quantité d'un mouvement est **toujours strictement positive** ; le sens (entrée/sortie/ajustement/transfert) est porté par `MOUVEMENT.type`.
 
-- **RG1** : un article appartient à au moins un client (commande). Un nouvel article sans commande n'est pas modélisable côté MCD (cardinalité 1,N obligatoire côté ARTICLE).
-- **RG2** : un stock est toujours localisé sur exactement une localisation (cardinalité 1,1 côté STOCK).
-- **RG3** : une localisation appartient à exactement un site (cardinalité 1,1 côté LOCALISATION).
-- **RG4** : chaque client est géré par un utilisateur unique (gestionnaire de compte).
-- **RG5** : chaque mouvement est tracé par un utilisateur unique (responsabilité opérationnelle).
+## 7. Hors périmètre V1 (à assumer en soutenance)
 
-## 5. Diagramme
+- **Achats** : la gestion des fournisseurs n'est pas modélisée (attribut texte `ARTICLE.fournisseur` uniquement).
+- **Commande transactionnelle complète** : la table `COMMANDE` ne porte que `quantite_commandee` et `date_commande` ; pas de prix, statut livraison, multi-lignes. La gestion complète des commandes est portée par l'ERP commercial NTL.
+- **Lots / numéros de série / dates de péremption** : modèle V1 considère tous les articles d'un type interchangeables.
+- **Transport / expédition** : aucune modélisation transporteur ou tournée.
+- **Multi-tenant client** : NTL grossiste = stock propre = pas d'isolation tenant logique. Si pivot 3PL futur → réintroduire FK `(article, client)`.
 
-Le diagramme graphique (PNG) doit être déposé en `wms-mcd.png`. Source originale : capture de l'outil de modélisation utilisé en réunion équipe le 2026-05-22.
+## 8. Génération du diagramme
+
+```bash
+cd 01-architecture-technique/mcd
+python -m mocodo --input wms-mcd.mcd --output_dir . --svg_to png --detect_overlaps
+```
+
+Génère : `wms-mcd.svg`, `wms-mcd.png`, `wms-mcd_geo.json`.

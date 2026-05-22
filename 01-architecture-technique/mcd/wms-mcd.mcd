@@ -1,0 +1,39 @@
+ARTICLE: id_article, nom, poids, fournisseur, type
+CONTENIR_AS, 1N ARTICLE, 11 STOCK
+STOCK: id_stock, quantite
+CONTENIR_SL, 11 STOCK, 1N LOCALISATION
+LOCALISATION: id_localisation, code, zone, allee, etage, place
+CONTENIR_LS, 11 LOCALISATION, 1N SITE
+SITE: id_site, libelle, adresse
+
+COMMANDE, 0N CLIENT, 0N ARTICLE: quantite_commandee, date_commande
+:
+EFFECTUER, 0N STOCK, 11 MOUVEMENT
+:
+:
+:
+:
+
+CLIENT: id_client, nom, siret, telephone, status
+CONCERNE, 01 MOUVEMENT, 0N CLIENT
+MOUVEMENT: id_mouvement, type, reference, date, heure, quantite
+:
+:
+:
+:
+
+ECHANGER, 11 CLIENT, 1N UTILISATEUR
+:
+REALISER, 0N UTILISATEUR, 11 MOUVEMENT
+:
+:
+:
+:
+
+UTILISATEUR: id_utilisateur, nom, role
+:
+:
+:
+:
+:
+:

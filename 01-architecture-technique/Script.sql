@@ -1,3 +1,9 @@
+-- =====================================================================
+-- WMS — Script DDL (V2 grossiste, 5 fixes MCD appliqués)
+-- Voir ddl/wms-schema.sql pour la version annotée et documentée.
+-- Charset : utf8mb4 / Moteur : InnoDB / Cible : MariaDB 11.4
+-- =====================================================================
+
 -- CREATE DATABASE gestion_stock;
 -- USE gestion_stock;
 
@@ -9,7 +15,7 @@ CREATE TABLE UTILISATEUR (
     PRIMARY KEY (id_utilisateur)
 ) ENGINE=InnoDB;
 
--- 2. Table : CLIENT (Dépend de UTILISATEUR via l'association ECHANGER 1,1)
+-- 2. Table : CLIENT (FK → UTILISATEUR, association ECHANGER 1,1)
 CREATE TABLE CLIENT (
     id_client INT AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL,
@@ -25,19 +31,23 @@ CREATE TABLE CLIENT (
 CREATE TABLE ARTICLE (
     id_article INT AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL,
-    poids DECIMAL(10,2), -- Correspond à "poids" sur le MCD (noté typo "prenom" sur le MLD)
+    poids DECIMAL(10,2),
     fournisseur VARCHAR(100),
     type VARCHAR(50),
     PRIMARY KEY (id_article)
 ) ENGINE=InnoDB;
 
--- 4. Table : COMMANDE (Table de liaison N,N entre CLIENT et ARTICLE)
+-- 4. Table : COMMANDE (table associative CLIENT ↔ ARTICLE avec attributs)
 CREATE TABLE COMMANDE (
-    id_client INT,
-    id_article INT,
-    PRIMARY KEY (id_client, id_article),
-    FOREIGN KEY (id_client) REFERENCES CLIENT(id_client) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (id_article) REFERENCES ARTICLE(id_article) ON DELETE CASCADE ON UPDATE CASCADE
+    id_commande INT AUTO_INCREMENT,
+    id_client INT NOT NULL,
+    id_article INT NOT NULL,
+    quantite_commandee INT NOT NULL,
+    date_commande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_commande),
+    FOREIGN KEY (id_client) REFERENCES CLIENT(id_client) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (id_article) REFERENCES ARTICLE(id_article) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CHECK (quantite_commandee > 0)
 ) ENGINE=InnoDB;
 
 -- 5. Table : SITE
@@ -48,7 +58,7 @@ CREATE TABLE SITE (
     PRIMARY KEY (id_site)
 ) ENGINE=InnoDB;
 
--- 6. Table : LOCALISATION (Dépend de SITE)
+-- 6. Table : LOCALISATION (FK → SITE)
 CREATE TABLE LOCALISATION (
     id_localisation INT AUTO_INCREMENT,
     code VARCHAR(50) NOT NULL,
@@ -61,34 +71,33 @@ CREATE TABLE LOCALISATION (
     FOREIGN KEY (id_site) REFERENCES SITE(id_site) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
--- 7. Table : STOCK (Dépend de LOCALISATION)
+-- 7. Table : STOCK (V2 : FK → ARTICLE ajoutée, association CONTENIR_AS 1,1)
 CREATE TABLE STOCK (
     id_stock INT AUTO_INCREMENT,
     quantite INT NOT NULL DEFAULT 0,
+    id_article INT NOT NULL,
     id_localisation INT NOT NULL,
     PRIMARY KEY (id_stock),
+    UNIQUE KEY uk_stock_article_localisation (id_article, id_localisation),
+    FOREIGN KEY (id_article) REFERENCES ARTICLE(id_article) ON DELETE RESTRICT ON UPDATE CASCADE,
     FOREIGN KEY (id_localisation) REFERENCES LOCALISATION(id_localisation) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
--- 8. Table : CONTENIR (Table de liaison N,N entre STOCK et ARTICLE)
-CREATE TABLE CONTENIR (
-    id_stock INT,
-    id_article INT,
-    PRIMARY KEY (id_stock, id_article),
-    FOREIGN KEY (id_stock) REFERENCES STOCK(id_stock) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (id_article) REFERENCES ARTICLE(id_article) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
-
--- 9. Table : MOUVEMENT (Dépend de UTILISATEUR et de STOCK)
+-- 8. Table : MOUVEMENT (V2 : quantite + id_client ajoutées, id_stock devient NOT NULL)
 CREATE TABLE MOUVEMENT (
     id_mouvement INT AUTO_INCREMENT,
-    ttype VARCHAR(50) NOT NULL, -- "ttype" d'après ton MLD pour éviter le mot-clé réservé TYPE
+    type VARCHAR(50) NOT NULL,
     reference VARCHAR(100),
     date DATE NOT NULL,
     heure TIME NOT NULL,
-    id_utilisateur INT NOT NULL,
+    quantite INT NOT NULL,
     id_stock INT NOT NULL,
+    id_utilisateur INT NOT NULL,
+    id_client INT NULL,
     PRIMARY KEY (id_mouvement),
+    FOREIGN KEY (id_stock) REFERENCES STOCK(id_stock) ON DELETE RESTRICT ON UPDATE CASCADE,
     FOREIGN KEY (id_utilisateur) REFERENCES UTILISATEUR(id_utilisateur) ON DELETE RESTRICT ON UPDATE CASCADE,
-    FOREIGN KEY (id_stock) REFERENCES STOCK(id_stock) ON DELETE RESTRICT ON UPDATE CASCADE
+    FOREIGN KEY (id_client) REFERENCES CLIENT(id_client) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CHECK (type IN ('entree','sortie','ajustement','transfert')),
+    CHECK (quantite > 0)
 ) ENGINE=InnoDB;

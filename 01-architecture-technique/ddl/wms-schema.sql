@@ -1,6 +1,6 @@
 -- =====================================================================
 -- WMS — Schéma DDL MariaDB 11.4
--- Version : 1.0 (2026-05-22) — dérivé du MCD simplifié 7 entités
+-- Version : 2.0 (2026-05-22) — MCD V2 grossiste, 5 fixes appliqués
 -- Voir : ../mcd/wms-mcd.md  et  ../mld/wms-mld.md
 -- Charset : utf8mb4 / collation utf8mb4_unicode_ci
 -- Moteur : InnoDB (FK + transactions)
@@ -8,8 +8,7 @@
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Ordre de DROP : tables associatives et dépendantes d'abord
-DROP TABLE IF EXISTS article_stock;
+-- Ordre de DROP : tables dépendantes d'abord
 DROP TABLE IF EXISTS commande;
 DROP TABLE IF EXISTS mouvement;
 DROP TABLE IF EXISTS stock;
@@ -18,6 +17,8 @@ DROP TABLE IF EXISTS client;
 DROP TABLE IF EXISTS utilisateur;
 DROP TABLE IF EXISTS localisation;
 DROP TABLE IF EXISTS site;
+-- V2 : table article_stock supprimée (N-N → 1-N via stock.id_article)
+DROP TABLE IF EXISTS article_stock;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -92,22 +93,32 @@ CREATE TABLE article (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================================
--- 6. STOCK (FK → localisation, association CONTENIR stock-localisation)
+-- 6. STOCK (FK → article ★ V2, → localisation)
+-- V2 : 1 stock = 1 article × 1 emplacement × 1 quantité
 -- =====================================================================
 CREATE TABLE stock (
     id_stock        INT UNSIGNED NOT NULL AUTO_INCREMENT,
     quantite        INT UNSIGNED NOT NULL DEFAULT 0,
+    id_article      INT UNSIGNED NOT NULL,
     id_localisation INT UNSIGNED NOT NULL,
     PRIMARY KEY (id_stock),
+    UNIQUE KEY uk_stock_article_localisation (id_article, id_localisation),
+    KEY idx_stock_article (id_article),
     KEY idx_stock_localisation (id_localisation),
+    CONSTRAINT fk_stock_article
+        FOREIGN KEY (id_article) REFERENCES article(id_article)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_stock_localisation
         FOREIGN KEY (id_localisation) REFERENCES localisation(id_localisation)
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================================
--- 7. MOUVEMENT (FK → stock, utilisateur)
--- Note : id_stock non-UNIQUE (écart MCD volontaire — voir wms-mcd.md §3)
+-- 7. MOUVEMENT (FK → stock, utilisateur, client ★ V2)
+-- V2 changements :
+--   - quantite ajoutée (CHECK > 0)
+--   - id_stock devient NOT NULL (cardinalité 1,1)
+--   - id_client ajoutée nullable (association CONCERNE 0,1)
 -- =====================================================================
 CREATE TABLE mouvement (
     id_mouvement   INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -115,20 +126,27 @@ CREATE TABLE mouvement (
     reference      VARCHAR(50)  NOT NULL,
     date           DATE         NOT NULL,
     heure          TIME         NOT NULL,
-    id_stock       INT UNSIGNED NULL,
+    quantite       INT UNSIGNED NOT NULL,
+    id_stock       INT UNSIGNED NOT NULL,
     id_utilisateur INT UNSIGNED NOT NULL,
+    id_client      INT UNSIGNED NULL,
     PRIMARY KEY (id_mouvement),
     UNIQUE KEY uk_mouvement_reference (reference),
     KEY idx_mouvement_date (date),
     KEY idx_mouvement_stock (id_stock),
     KEY idx_mouvement_utilisateur (id_utilisateur),
+    KEY idx_mouvement_client (id_client),
     CONSTRAINT fk_mouvement_stock
         FOREIGN KEY (id_stock) REFERENCES stock(id_stock)
-        ON DELETE SET NULL ON UPDATE CASCADE,
+        ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_mouvement_utilisateur
         FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT ck_mouvement_type CHECK (type IN ('entree','sortie','ajustement','transfert'))
+    CONSTRAINT fk_mouvement_client
+        FOREIGN KEY (id_client) REFERENCES client(id_client)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT ck_mouvement_type CHECK (type IN ('entree','sortie','ajustement','transfert')),
+    CONSTRAINT ck_mouvement_quantite CHECK (quantite > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================================
@@ -153,22 +171,5 @@ CREATE TABLE commande (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================================
--- 9. ARTICLE_STOCK (table associative ARTICLE ↔ STOCK)
--- =====================================================================
-CREATE TABLE article_stock (
-    id_article INT UNSIGNED NOT NULL,
-    id_stock   INT UNSIGNED NOT NULL,
-    date_ajout DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id_article, id_stock),
-    KEY idx_article_stock_stock (id_stock),
-    CONSTRAINT fk_article_stock_article
-        FOREIGN KEY (id_article) REFERENCES article(id_article)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_article_stock_stock
-        FOREIGN KEY (id_stock) REFERENCES stock(id_stock)
-        ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- =====================================================================
--- Fin du script
+-- Fin du script — 8 tables (V2 : article_stock supprimée)
 -- =====================================================================
