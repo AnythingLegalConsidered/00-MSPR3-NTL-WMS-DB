@@ -3,15 +3,25 @@
 **Émetteur** : DSI / Équipe projet WMS-DB
 
 **Destinataires** : Comité de direction NordTransit Logistics
+
 **Date** : 2026-05-22
+
 **Objet** : Risques cyber sur la base de données WMS, impacts opérationnels, plan d'action proposé
-**Format** : note de cadrage — 2 pages — décision attendue
 
 ---
 
 ## 1. Contexte
 
-Le nouveau WMS pilote l'ensemble de nos opérations d'entrepôt sur les quatre sites (siège Lille, Lens, Valenciennes, Arras). Sa base de données concentre désormais **la totalité de notre activité logistique** : stocks, mouvements, ordres clients, traçabilité. Une indisponibilité ou une compromission de cette base arrête les quais et expose NTL à des pénalités contractuelles. La présente note expose les cinq risques majeurs identifiés, leurs conséquences métier, et le plan d'action proposé à votre arbitrage.
+Le nouveau WMS pilote l'ensemble de nos opérations d'entrepôt sur les quatre sites (siège Lille, Lens, Valenciennes, Arras). Sa base de données concentre désormais **la totalité de notre activité logistique** : stocks, mouvements, ordres clients, traçabilité.
+
+Concrètement, si cette base devient inaccessible ou est compromise :
+
+- les quais ne peuvent plus enregistrer de réception ni d'expédition sur les quatre sites simultanément ;
+- les engagements de délai pris auprès de nos clients sont rompus, avec activation des **clauses de pénalité contractuelles** ;
+- la confiance commerciale est entamée, notamment sur les **comptes-clés multi-tenants** ;
+- en cas de fuite, NTL est exposé à des **obligations RGPD** (notification 72 h) et à un risque réputationnel.
+
+La présente note expose les cinq risques majeurs identifiés, leurs conséquences métier, et le plan d'action proposé à votre arbitrage.
 
 ## 2. Les cinq risques majeurs
 
@@ -25,15 +35,15 @@ Le nouveau WMS pilote l'ensemble de nos opérations d'entrepôt sur les quatre s
 
 ## 3. Impact métier
 
-Hypothèses retenues pour le chiffrage indicatif (à valider avec le contrôle de gestion) : CA journalier des opérations entrepôt ≈ 80 k€, pénalités contractuelles type **2 % du CA mensuel concerné par retard** sur les comptes-clés.
+> **Note méthodologique** : à ce stade du projet, aucune analyse d'impact métier (BIA — Business Impact Analysis) n'a été conduite avec la direction financière et les directions d'exploitation. Les niveaux d'impact ci-dessous sont donc **qualitatifs** (Modéré / Élevé / Critique). La quantification financière fera l'objet d'un travail dédié, sous le pilotage du contrôle de gestion, et constitue elle-même l'une des décisions demandées au CODIR (§6).
 
-| Risque | Conséquence opérationnelle | Coût d'occurrence estimé |
+| Risque | Conséquence opérationnelle | Niveau d'impact |
 |---|---|---|
-| **1. Arrêt prolongé** | Quais bloqués sur 4 sites · réception et expédition figées · escalade vers les transporteurs et les clients · perte de créneaux | **80-160 k€ par journée perdue** + pénalités · risque réputation |
-| **2. Vol d'accès** | Modifications silencieuses des stocks, vols facilités, données clients exfiltrées | Stocks à recompter manuellement · CNIL (RGPD) si données personnelles · perte de clients |
-| **3. Ransomware** | Activité à l'arrêt plusieurs jours · pression rançon · reprise depuis sauvegardes papier | **> 500 k€** sur 5 jours · risque de fermeture temporaire d'un site |
-| **4. Fuite multi-tenant** | Perte de confiance d'un compte-clé · résiliation possible · effet boule de neige commercial | Perte d'un contrat = **plusieurs centaines de k€/an** |
-| **5. Perte de traçabilité** | Impossible de prouver notre conformité en cas de litige ou contrôle · assurance cyber qui refuse de couvrir | Non quantifiable directement, mais bloquant en cas d'incident |
+| **1. Arrêt prolongé** | Quais bloqués sur les 4 sites, réception et expédition figées, escalade vers transporteurs et clients, perte de créneaux de livraison, activation des pénalités contractuelles | **Critique** |
+| **2. Vol d'accès** | Modifications silencieuses des stocks, exfiltration possible des données clients, vols internes facilités, perte de confiance commerciale | **Critique** |
+| **3. Ransomware** | Activité à l'arrêt plusieurs jours, pression d'une demande de rançon, reprise dégradée via procédures papier, communication de crise à gérer | **Critique** |
+| **4. Fuite multi-tenant** | Un client constate qu'il voit (ou pourrait voir) les données d'un autre client : perte de confiance immédiate, résiliation possible, effet de contagion commerciale | **Élevé** |
+| **5. Perte de traçabilité** | Impossibilité de prouver notre conformité lors d'un litige client, d'un contrôle ou d'un sinistre, refus possible de l'assureur cyber d'indemniser | **Élevé** |
 
 ## 4. Plan d'action proposé
 
@@ -49,10 +59,9 @@ Les mesures sont classées par priorité : **P1 = à engager immédiatement**, *
 
 ### P2 — Dans les 3 mois (couvre les risques 2, 4, 5)
 
-- **Cloisonnement strict des accès** : chaque application accède uniquement à ce dont elle a besoin (principe du moindre privilège)
-- **Audit log inviolable** : journalisation centralisée, écriture seule, conservation 12 mois minimum
-- **Vérification du cloisonnement client** : revue indépendante de l'étanchéité multi-tenant avant ouverture à un cinquième client
-- **Procédures incident formalisées** (RunBook) : qui appeler, dans quel ordre, en combien de temps
+- **Cloisonnement strict des accès** : chaque application et chaque utilisateur n'a accès qu'aux données dont il a strictement besoin pour son rôle — comme un employé qui ne reçoit que les clés des armoires de son service. Si un compte est compromis, l'attaquant ne peut pas se déplacer librement dans le reste du système.
+- **Audit log inviolable** : journalisation centralisée des accès et des modifications, en écriture seule (impossible à effacer même pour un administrateur), conservation 12 mois minimum.
+- **Procédures incident formalisées** (RunBook) : qui appeler, dans quel ordre, en combien de temps, avec quels moyens de communication de repli.
 
 ### P3 — Dans les 6 mois (résilience long terme)
 
@@ -60,21 +69,23 @@ Les mesures sont classées par priorité : **P1 = à engager immédiatement**, *
 - **Souscription d'une assurance cyber** alignée sur le niveau de maturité atteint
 - **Sensibilisation des équipes opérationnelles** (hameçonnage, gestion des accès, hygiène mots de passe)
 
-## 5. Budget indicatif et délais
+## 5. Effort et délais
 
-| Priorité | Effort interne | Investissement externe | Délai cible |
-|---|---|---|---|
-| P1 | 15-20 j.h équipe IT | Sauvegarde externalisée : **5-10 k€/an** · MFA : déjà licencié M365 | **6 semaines** |
-| P2 | 20-25 j.h | Journalisation centralisée : **3-5 k€/an** · audit externe multi-tenant : **5-8 k€** ponctuel | **3 mois** |
-| P3 | 10-15 j.h | Assurance cyber : **8-15 k€/an** (selon couverture) · sensibilisation : **2-3 k€** | **6 mois** |
+Le chiffrage financier des mesures n'est pas encore consolidé : il dépend d'arbitrages techniques en cours (topologie cluster, choix solution de sauvegarde externalisée, périmètre assurance) et de devis fournisseurs à instruire. La présente note s'en tient donc à l'**effort interne** et au **délai cible** pour chaque priorité.
 
-**Total ordre de grandeur : 25-45 k€ d'investissement année 1**, à mettre en regard d'**une seule journée d'arrêt évitée (80-160 k€)**.
+| Priorité | Effort interne (équipe IT) | Délai cible |
+|---|---|---|
+| P1 | Mobilisation significative — chantier prioritaire | **6 semaines** |
+| P2 | Effort modéré — en parallèle de l'exploitation courante | **3 mois** |
+| P3 | Effort ponctuel — exercices et formation | **6 mois** |
+
+Un chiffrage détaillé (CAPEX / OPEX, j.h consolidés, devis fournisseurs) sera présenté au CODIR suivant validation de principe du plan.
 
 ## 6. Décisions attendues du Comité
 
-1. **Validation du plan P1** et déblocage budgétaire associé (sauvegarde externalisée, HA, MFA admin).
-2. **Désignation d'un sponsor exécutif** côté direction pour le suivi mensuel des indicateurs cyber.
-3. **Arbitrage sur l'assurance cyber** (P3) : périmètre souhaité et plafond de couverture.
+1. **Validation de principe du plan P1** (sauvegarde externalisée, HA, MFA admin) et mandat à la DSI pour instruire les devis fournisseurs en vue d'un arbitrage budgétaire chiffré au prochain CODIR.
+2. **Lancement d'une analyse d'impact métier (BIA)** sous le pilotage du contrôle de gestion, avec les directions d'exploitation, afin de quantifier le coût des risques décrits au §3 et de calibrer les investissements.
+3. **Désignation d'un sponsor exécutif** côté direction pour le suivi mensuel des indicateurs cyber.
 4. **Validation du principe d'un exercice de crise annuel** impliquant la direction.
 
 ---
