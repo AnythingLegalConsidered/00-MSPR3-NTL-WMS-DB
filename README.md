@@ -37,7 +37,7 @@ Détail par livrable dans le `README.md` de chaque dossier. Vue d'ensemble équi
 
 ## Décisions de cadrage
 
-- **SGBD** : MariaDB 11.4 LTS (justification à formaliser).
+- **SGBD** : MariaDB 11.4 LTS — justification actée le 2026-05-22 ([`decisions/0002-sgbd-mariadb.md`](decisions/0002-sgbd-mariadb.md)).
 - **MCD V4 officielle à 8 entités** : SITE, EMPLACEMENT, ARTICLE, FOURNISSEUR, STOCK, UTILISATEUR, MOUVEMENT, CLIENT. Modèle 14 entités (lots/FEFO, commandes, expéditions, transporteurs) repoussé en évolution fonctionnelle.
 - **Multi-tenant double verrou** : (a) association `realise_pour CLIENT-MOUVEMENT` au MCD pour visibilité ; (b) FK composite `(id_article, id_client)` depuis `STOCK` et `MOUVEMENT` vers `articles(id_article, id_client)` (option D) au MLD/DDL.
 - **Rattachement site** : `STOCK` hérite du site via `EMPLACEMENT` ; `MOUVEMENT` porte un `id_site` dénormalisé garantissant TRANSFERT intra-site par FK composite déclarative `(id_depart, id_site) → emplacements(id_emplacement, id_site)`.
