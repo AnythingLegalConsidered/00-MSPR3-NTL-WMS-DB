@@ -1,6 +1,8 @@
-# BRIEF-IA — kit d'amorçage pour nouvelle conversation IA
+# BRIEF-IA — interroger une IA sur le projet
 
-> Mode d'emploi : copie-colle **tout le contenu de ce fichier** comme premier message dans Claude Desktop / ChatGPT / autre, puis **joins les fichiers listés en bas**. L'IA aura alors tout le contexte pour répondre intelligemment sur le projet.
+> **Utilise le dossier [`brief-ia/`](brief-ia/)** : il contient les 8 fichiers à joindre + un README avec le prompt prêt à coller. Mode d'emploi en 2 min.
+>
+> Ce fichier-ci reste comme point d'entrée historique / référence. Pour l'usage opérationnel, va dans `brief-ia/`.
 
 ---
 
