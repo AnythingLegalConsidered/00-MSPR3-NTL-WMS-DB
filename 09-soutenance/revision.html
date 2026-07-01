@@ -3,1571 +3,664 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Révision Soutenance — MSPR3 NTL WMS</title>
+<title>Révision — MSPR3 NTL WMS</title>
 <style>
   :root {
-    --bg: #faf9f7;
-    --card: #ffffff;
-    --border: #d0cec9;
-    --border-light: #e8e6e1;
-    --text: #1a1a1a;
-    --muted: #6b6b6b;
-    --navy: #1a3a5c;
-    --red: #8b1a1a;
+    --navy:   #1a3a5c;
+    --gold:   #c8a84b;
+    --green:  #1a4a2a;
+    --red:    #8b1a1a;
     --orange: #7a3d00;
-    --green: #1a4a2a;
-    --yellow: #5c4400;
+    --blue:   #2b6cb0;
+    --bg:     #faf9f7;
+    --card:   #ffffff;
+    --border: #d0cec9;
+    --text:   #1a1a1a;
+    --muted:  #6b6b6b;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: Georgia, 'Times New Roman', serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg);
     color: var(--text);
     font-size: 15px;
-    line-height: 1.7;
-    padding-bottom: 3rem;
+    line-height: 1.65;
   }
 
-  /* ── HEADER ── */
-  #header {
+  /* ── FIL ROUGE ── */
+  #fil-rouge {
+    background: var(--navy);
+    color: #e8d9b0;
+    padding: 0.55rem 1rem;
+    font-size: 0.82rem;
+    font-style: italic;
+    border-bottom: 3px solid var(--gold);
     position: sticky;
     top: 0;
+    z-index: 200;
+  }
+  #fil-rouge strong { color: #f5e8c0; font-style: normal; }
+
+  /* ── TABS ── */
+  #tab-nav {
+    position: sticky;
+    top: 36px;
     z-index: 100;
-    background: var(--navy);
-    border-bottom: 3px solid #c8a84b;
-    padding: 0.7rem 1.2rem;
-  }
-
-  #fil-rouge {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 0.82rem;
-    color: #e8d9b0;
-    font-style: italic;
-    margin-bottom: 0.4rem;
-  }
-
-  #fil-rouge strong { color: #f5e8c0; font-style: normal; font-weight: 700; }
-
-  #nav-toggle {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #cbd5e1;
-    border-radius: 3px;
-    padding: 0.3rem 0.8rem;
-    font-size: 0.78rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-    letter-spacing: 0.02em;
-  }
-
-  #nav-toggle:hover { background: rgba(255,255,255,0.08); }
-
-  #nav-menu {
-    display: none;
-    background: #0f2340;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 3px;
-    margin-top: 0.3rem;
-    overflow: hidden;
-  }
-
-  #nav-menu.open { display: block; }
-
-  #nav-menu a {
-    display: block;
-    padding: 0.5rem 1rem;
-    color: #cbd5e1;
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-  }
-
-  #nav-menu a:last-child { border-bottom: none; }
-  #nav-menu a:hover { background: rgba(255,255,255,0.06); color: #fff; }
-
-  /* ── MAIN ── */
-  main { padding: 1.5rem 1rem; max-width: 800px; margin: 0 auto; }
-
-  /* ── SOMMAIRE ── */
-  #sommaire {
     background: var(--card);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--navy);
-    border-radius: 2px;
-    padding: 1.2rem 1.4rem;
-    margin-bottom: 1.5rem;
-  }
-
-  #sommaire h2 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-bottom: 0.8rem;
-  }
-
-  #sommaire ol {
-    list-style: decimal;
-    padding-left: 1.4rem;
-    column-count: 2;
-    column-gap: 2rem;
-  }
-
-  #sommaire li {
-    margin-bottom: 0.35rem;
-    font-size: 0.88rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    break-inside: avoid;
-  }
-
-  #sommaire a {
-    color: var(--navy);
-    text-decoration: none;
-  }
-
-  #sommaire a:hover { text-decoration: underline; }
-
-  @media (max-width: 500px) {
-    #sommaire ol { column-count: 1; }
-  }
-
-  /* ── SECTION ── */
-  .section {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    margin-bottom: 0.9rem;
-    overflow: hidden;
-  }
-
-  .section-header {
+    border-bottom: 2px solid var(--border);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.85rem 1.1rem;
-    cursor: pointer;
-    gap: 0.5rem;
-    border-left: 4px solid var(--navy);
-    -webkit-tap-highlight-color: transparent;
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .section-header:hover { background: #f5f3ef; }
-
-  .section-title {
-    font-size: 0.92rem;
-    font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--navy);
-  }
-
-  .chevron {
-    color: var(--muted);
-    font-size: 0.7rem;
-    transition: transform 0.2s;
+  .tab-btn {
     flex-shrink: 0;
-    font-family: sans-serif;
+    padding: 0.6rem 1.1rem;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
   }
+  .tab-btn:hover { color: var(--navy); }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--navy); }
 
-  .section.open .chevron { transform: rotate(180deg); }
+  /* ── PANELS ── */
+  .tab-panel { display: none; padding: 1.2rem 1rem 3rem; max-width: 820px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
 
-  .section-body {
-    display: none;
-    padding: 0.8rem 1.1rem 1.1rem;
-    border-top: 1px solid var(--border-light);
+  /* ── BLOCKS ── */
+  .block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--navy);
+    border-radius: 2px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.9rem;
   }
-
-  .section.open .section-body { display: block; }
-
-  /* ── TYPOGRAPHY ── */
-  h3 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  .block-title {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.09em;
     color: var(--muted);
-    margin: 1.2rem 0 0.5rem;
-    border-bottom: 1px solid var(--border-light);
-    padding-bottom: 0.25rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #eee;
   }
-
-  h3:first-child { margin-top: 0.6rem; }
-
-  p { margin: 0.4rem 0; font-size: 0.9rem; }
-
-  strong { color: var(--text); }
-
-  code {
-    font-family: 'Courier New', Consolas, monospace;
-    font-size: 0.82em;
-    background: #f0ede8;
-    padding: 0.1em 0.35em;
-    border-radius: 2px;
-    color: #2a1a0a;
-    border: 1px solid #d8d4cc;
-  }
-
-  ul { padding-left: 1.3rem; }
-  ul li { font-size: 0.9rem; margin-bottom: 0.2rem; }
 
   /* ── CALLOUTS ── */
   .callout {
-    border-radius: 2px;
-    padding: 0.75rem 1rem;
-    margin: 0.8rem 0;
-    font-size: 0.88rem;
     border-left: 3px solid;
+    border-radius: 2px;
+    padding: 0.65rem 0.9rem;
+    margin: 0.7rem 0;
+    font-size: 0.88rem;
   }
-
-  .callout-red    { background: #fdf5f5; border-color: var(--red);    color: #5a1010; }
-  .callout-orange { background: #fdf8f0; border-color: var(--orange); color: #5a2d00; }
-  .callout-green  { background: #f5fdf7; border-color: var(--green);  color: #1a3a22; }
-  .callout-blue   { background: #f5f7fd; border-color: var(--navy);   color: #1a2f4a; }
-
-  .callout strong { color: inherit; }
-  .callout-title {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 700;
-    margin-bottom: 0.35rem;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-  }
-
-  /* ── TABLES ── */
-  .table-wrap { overflow-x: auto; margin: 0.8rem 0; }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.84rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-width: 320px;
-  }
-
-  th {
-    background: #f0ede8;
-    color: var(--muted);
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 0.07em;
-    padding: 0.5rem 0.8rem;
-    text-align: left;
-    border-bottom: 2px solid var(--border);
-    border-top: 1px solid var(--border);
-  }
-
-  td {
-    padding: 0.5rem 0.8rem;
-    border-bottom: 1px solid var(--border-light);
-    vertical-align: top;
-  }
-
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #faf8f4; }
-
-  .val-key {
-    color: var(--navy);
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-  }
+  .c-blue   { background: #f5f7fd; border-color: var(--navy);   color: #1a2f4a; }
+  .c-green  { background: #f5fdf7; border-color: var(--green);  color: #1a3a22; }
+  .c-red    { background: #fdf5f5; border-color: var(--red);    color: #5a1010; }
+  .c-orange { background: #fdf8f0; border-color: var(--orange); color: #5a2d00; }
 
   /* ── Q&A ── */
   .qa {
-    margin: 0.8rem 0;
     border: 1px solid var(--border);
     border-radius: 2px;
+    margin: 0.5rem 0;
     overflow: hidden;
   }
-
   .qa-q {
-    padding: 0.65rem 0.9rem;
+    padding: 0.6rem 0.8rem;
     background: #fdf8f0;
+    border-left: 3px solid var(--orange);
     font-size: 0.87rem;
-    font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 600;
     color: var(--orange);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 0.5rem;
-    border-left: 3px solid var(--orange);
     -webkit-tap-highlight-color: transparent;
   }
-
-  .qa-q .qa-chevron { flex-shrink: 0; font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
-  .qa.open .qa-chevron { transform: rotate(180deg); }
-
+  .qa-q .chev { flex-shrink: 0; font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+  .qa.open .chev { transform: rotate(180deg); }
   .qa-a {
     display: none;
-    padding: 0.75rem 0.9rem;
-    font-size: 0.87rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.86rem;
     line-height: 1.7;
-    border-top: 1px solid var(--border-light);
-    color: var(--text);
+    border-top: 1px solid #eee;
     background: #fefefe;
   }
-
   .qa.open .qa-a { display: block; }
+
+  /* ── TABLES ── */
+  .tw { overflow-x: auto; margin: 0.7rem 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; min-width: 280px; }
+  th { background: #f0ede8; color: var(--muted); font-weight: 700; text-transform: uppercase;
+       font-size: 0.7rem; letter-spacing: 0.06em; padding: 0.45rem 0.7rem;
+       text-align: left; border-bottom: 2px solid var(--border); }
+  td { padding: 0.42rem 0.7rem; border-bottom: 1px solid #eee; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #faf8f4; }
+  .num { color: var(--navy); font-weight: 700; font-family: 'Courier New', monospace; }
 
   /* ── TAGS ── */
   .tag {
-    display: inline-block;
-    font-size: 0.68rem;
-    font-weight: 700;
-    padding: 0.1em 0.45em;
-    border-radius: 2px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    vertical-align: middle;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    border: 1px solid;
+    display: inline-block; font-size: 0.67rem; font-weight: 700;
+    padding: 0.1em 0.45em; border-radius: 2px; letter-spacing: 0.05em;
+    text-transform: uppercase; vertical-align: middle; border: 1px solid;
   }
+  .t-red    { color: var(--red);    border-color: #c9a0a0; background: #fdf5f5; }
+  .t-orange { color: var(--orange); border-color: #c9b090; background: #fdf8f0; }
+  .t-green  { color: var(--green);  border-color: #90b0a0; background: #f5fdf7; }
+  .t-blue   { color: var(--navy);   border-color: #90a8c0; background: #f5f7fd; }
 
-  .tag-red    { color: var(--red);    border-color: #c9a0a0; background: #fdf5f5; }
-  .tag-orange { color: var(--orange); border-color: #c9b090; background: #fdf8f0; }
-  .tag-green  { color: var(--green);  border-color: #90b0a0; background: #f5fdf7; }
-  .tag-blue   { color: var(--navy);   border-color: #90a8c0; background: #f5f7fd; }
-  .tag-purple { color: #3a1a5c;       border-color: #b0a0c8; background: #f8f5fd; }
-
-  /* ── ORATEURS ── */
-  .orateurs {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    margin: 0.3rem 0 0.7rem;
-  }
-
-  .orateur {
-    font-size: 0.74rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    padding: 0.15em 0.6em;
-    border-radius: 2px;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    background: #f8f6f2;
-  }
-
-  /* ── SCÉNARIOS ── */
-  .scenario {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.3rem 1rem;
-    align-items: center;
-    padding: 0.45rem 0;
-    border-bottom: 1px solid var(--border-light);
-    font-size: 0.86rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
-
-  .scenario:last-child { border-bottom: none; }
-  .scenario-rto {
-    color: var(--green);
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-    text-align: right;
-    white-space: nowrap;
-  }
-
-  /* ── TOP BUTTON ── */
-  #top-btn {
-    position: fixed;
-    bottom: 1.2rem;
-    right: 1.2rem;
-    background: var(--navy);
-    color: #e8d9b0;
-    border: none;
-    border-radius: 2px;
-    width: 38px;
-    height: 38px;
-    font-size: 1rem;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    font-family: sans-serif;
-  }
-
-  #top-btn.visible { opacity: 1; }
-
-  /* ── LÉGENDE COULEURS ── */
-  .legend-section {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 0.9rem 1.1rem;
-    margin-bottom: 0.9rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
-  .legend-title {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    color: var(--muted);
-    margin-bottom: 0.6rem;
-    border-bottom: 1px solid var(--border-light);
-    padding-bottom: 0.3rem;
-  }
-  .legend-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.4rem 1rem;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-  }
-  .legend-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 2px;
-    flex-shrink: 0;
-    border: 1px solid rgba(0,0,0,0.15);
-  }
-
-  /* ── MLD TABLES VISUELLES ── */
-  .mld-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.7rem;
-    margin: 1rem 0;
-  }
-  @media (max-width: 560px) { .mld-grid { grid-template-columns: 1fr; } }
-
-  .mld-card {
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    font-family: 'Courier New', Consolas, monospace;
-    font-size: 0.74rem;
-  }
-  .mld-card-header {
-    background: var(--navy);
-    color: #e8d9b0;
-    padding: 0.3rem 0.55rem;
-    font-weight: 700;
-    font-size: 0.76rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .mld-card-header .mld-star { color: #c8a84b; margin-left: 0.3em; }
-  .mld-row {
-    display: grid;
-    grid-template-columns: 1.1fr 1.6fr;
-    border-bottom: 1px solid var(--border-light);
-  }
-  .mld-row:last-child { border-bottom: none; }
-  .mld-c1 {
-    padding: 0.22rem 0.5rem;
-    border-right: 1px solid var(--border-light);
-    font-weight: 600;
-    font-size: 0.72rem;
-  }
-  .mld-c2 {
-    padding: 0.22rem 0.5rem;
-    font-size: 0.68rem;
-    color: var(--muted);
-  }
-  /* Couleurs par type de contrainte */
-  .r-pk   { background: #fdf8ea; }
-  .r-pk .mld-c1   { color: #7a5a00; }
-  .r-fk   { background: #eef3fb; }
-  .r-fk .mld-c1   { color: #1a3a5c; }
-  .r-uq   { background: #f3eefb; }
-  .r-uq .mld-c1   { color: #4a2a8c; }
-  .r-ck   { background: #eefbf3; }
-  .r-ck .mld-c1   { color: #1a4a2a; }
-  .r-null { background: #fafaf7; }
-  .r-null .mld-c1 { color: var(--muted); font-style: italic; }
-
-  /* Badges inline */
-  .b {
-    display: inline-block;
-    font-size: 0.58rem;
-    padding: 0.05em 0.3em;
-    border-radius: 2px;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    vertical-align: middle;
-    margin-left: 0.2em;
-    border: 1px solid;
-    font-family: -apple-system, sans-serif;
-  }
-  .b-pk   { background: #fdf8ea; color: #7a5a00; border-color: #c8a84b; }
-  .b-fk   { background: #eef3fb; color: #1a3a5c; border-color: #2b6cb0; }
-  .b-uq   { background: #f3eefb; color: #4a2a8c; border-color: #6b46c1; }
-  .b-ck   { background: #eefbf3; color: #1a4a2a; border-color: #276749; }
-  .b-n    { background: #f0f0f0; color: #6b6b6b; border-color: #bbb; }
-
-  /* ── INFRA SERVEURS ── */
-  .server-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.7rem;
-    margin: 0.8rem 0;
-  }
-  @media (max-width: 600px) { .server-grid { grid-template-columns: 1fr; } }
-
-  .srv-card {
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
-  .srv-header {
-    padding: 0.45rem 0.65rem;
-    font-weight: 700;
-    font-size: 0.78rem;
-    color: white;
-  }
-  .srv-master { background: var(--navy); }
-  .srv-ha     { background: #2b6cb0; }
-  .srv-pra    { background: #276749; }
-
-  .srv-body { padding: 0.4rem 0.65rem; }
-  .srv-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.18rem 0;
-    border-bottom: 1px solid var(--border-light);
-    font-size: 0.76rem;
-  }
-  .srv-row:last-child { border-bottom: none; }
-  .srv-lbl { color: var(--muted); flex-shrink: 0; }
-  .srv-val { font-weight: 600; text-align: right; font-size: 0.74rem; }
-
-  .stack-row {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin: 0.6rem 0;
-  }
-  .stack-pill {
-    background: #f5f3ef;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 0.25rem 0.55rem;
-    font-size: 0.76rem;
-    font-family: -apple-system, sans-serif;
-  }
-  .stack-pill strong { color: var(--navy); }
-
-  /* ── À DIRE (pense-bête oral) ── */
-  .a-dire {
+  /* ── "À DIRE" ── */
+  .adire {
     background: #f5fdf7;
     border: 1px solid #b0d4bc;
     border-left: 3px solid var(--green);
     border-radius: 2px;
-    padding: 0.65rem 0.9rem;
-    margin: 0.9rem 0 0.4rem;
+    padding: 0.6rem 0.9rem;
+    margin: 0.7rem 0;
   }
-  .a-dire-title {
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    color: var(--green);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 700;
-    margin-bottom: 0.4rem;
+  .adire-title {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--green); font-weight: 700; margin-bottom: 0.35rem;
   }
-  .a-dire ul {
-    margin: 0;
-    padding-left: 1.1rem;
-    font-size: 0.86rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    line-height: 1.75;
+  .adire ul { padding-left: 1.1rem; font-size: 0.85rem; line-height: 1.75; }
+  .adire li { margin-bottom: 0.1rem; }
+  .adire .tr { color: var(--navy); font-size: 0.82rem; margin-top: 0.35rem; font-style: italic; }
+
+  /* ── SCHEMA RELATIONNEL ── */
+  .schema {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    background: #f5f3ef;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.7rem 0.9rem;
+    line-height: 1.9;
+    margin: 0.7rem 0;
+    overflow-x: auto;
+    white-space: nowrap;
   }
-  .a-dire li { margin-bottom: 0.1rem; }
-  .a-dire .secours { font-size: 0.8rem; color: var(--muted); font-style: italic; }
-  .a-dire .transition { color: var(--navy); font-size: 0.82rem; margin-top: 0.4rem; font-style: italic; }
+  .s-pk   { color: #7a5a00; font-weight: 700; }
+  .s-fk   { color: var(--blue); }
+  .s-uq   { color: #4a2a8c; }
+
+  code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8em;
+    background: #f0ede8;
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    border: 1px solid #d8d4cc;
+  }
+
+  p { font-size: 0.9rem; margin: 0.3rem 0; }
+  strong { color: var(--text); }
+  ul { padding-left: 1.2rem; }
+  li { font-size: 0.9rem; margin-bottom: 0.2rem; }
 </style>
 </head>
 <body>
 
+<div id="fil-rouge">
+  Fil rouge — <strong>« On a tranché une ambiguïté par un postulat assumé »</strong> — jamais « on n'a pas compris le sujet »
+</div>
+
+<nav id="tab-nav">
+  <button class="tab-btn active" onclick="showTab('pitch')">Pitch</button>
+  <button class="tab-btn" onclick="showTab('modele')">Modèle</button>
+  <button class="tab-btn" onclick="showTab('archi')">Architecture</button>
+  <button class="tab-btn" onclick="showTab('secu')">Sécurité & Superv.</button>
+  <button class="tab-btn" onclick="showTab('pivot')">Pivot & Choix</button>
+  <button class="tab-btn" onclick="showTab('entretien')">Entretien & Pièges</button>
+</nav>
+
 <!-- ══════════════════════════════════════════════
-     STICKY HEADER
+     TAB 1 — PITCH
 ═══════════════════════════════════════════════ -->
-<div id="header">
-  <div id="fil-rouge">
-    Fil rouge — <strong>« On a tranché une ambiguïté par un postulat assumé »</strong> · JAMAIS « on n'a pas compris le sujet »
-  </div>
-  <button id="nav-toggle" onclick="toggleNav()">☰ Navigation rapide ▾</button>
-  <div id="nav-menu">
-    <a href="#sommaire"  onclick="closeNav()">Sommaire</a>
-    <a href="#s0"  onclick="closeNav()">0 · Le projet en 30 s</a>
-    <a href="#s1"  onclick="closeNav()">1 · Chiffres-clés</a>
-    <a href="#s2"  onclick="closeNav()">2 · Modèle de données</a>
-    <a href="#s3"  onclick="closeNav()">3 · Architecture HA / PRA</a>
-    <a href="#s3b" onclick="closeNav()">3b · Infrastructure technique</a>
-    <a href="#s4"  onclick="closeNav()">4 · Supervision</a>
-    <a href="#s5"  onclick="closeNav()">5 · Sécurité</a>
-    <a href="#s6"  onclick="closeNav()">6 · Exploitation</a>
-    <a href="#s7"  onclick="closeNav()">7 · Piège n°1</a>
-    <a href="#s8"  onclick="closeNav()">8 · Pivot de cadrage</a>
-    <a href="#s9"  onclick="closeNav()">9 · Choix techniques</a>
-    <a href="#s10" onclick="closeNav()">10 · V1 / V2</a>
-    <a href="#s10b" onclick="closeNav()">10b · Questions pièges jury</a>
-    <a href="#s11" onclick="closeNav()">11 · Répartition orateurs</a>
-    <a href="#s12" onclick="closeNav()">12 · Réflexes entretien</a>
-  </div>
-</div>
+<div class="tab-panel active" id="tab-pitch">
 
-<main>
-
-<!-- ══ SOMMAIRE ══ -->
-<div id="sommaire">
-  <h2>Plan de la soutenance</h2>
-  <ol>
-    <li><a href="#s0">Le projet en 30 secondes</a></li>
-    <li><a href="#s2">Modèle de données (MCD / DDL)</a></li>
-    <li><a href="#s3">Architecture Haute Disponibilité &amp; PRA</a></li>
-    <li><a href="#s3b">Infrastructure technique (OS, versions, matériel)</a></li>
-    <li><a href="#s5">Sécurité — Note CODIR</a></li>
-    <li><a href="#s4">Supervision &amp; indicateurs</a></li>
-    <li><a href="#s6">Exploitation — RunBook &amp; logs</a></li>
-    <li><a href="#s8">Pivot de cadrage (difficulté)</a></li>
-    <li><a href="#s10">Résultats &amp; perspectives V2</a></li>
-    <li><a href="#s10b">Questions pièges — jury difficile</a></li>
-  </ol>
-</div>
-
-<!-- ══ LÉGENDE COULEURS MLD ══ -->
-<div class="legend-section">
-  <div class="legend-title">Code couleur — Modèle physique (MLD)</div>
-  <div class="legend-grid">
-    <div class="legend-item"><span class="legend-dot" style="background:#fdf8ea;border-color:#c8a84b"></span> PK — Clé primaire</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#eef3fb;border-color:#2b6cb0"></span> FK — Clé étrangère</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#f3eefb;border-color:#6b46c1"></span> UNIQUE — Unicité métier</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#eefbf3;border-color:#276749"></span> CHECK — Contrainte valeur</div>
-    <div class="legend-item"><span class="legend-dot" style="background:#fafaf7;border-color:#bbb"></span> NULL autorisé</div>
-  </div>
-</div>
-
-<!-- ══ 0. LE PROJET EN 30 SECONDES ══ -->
-<div class="section open" id="s0">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">0 · Le projet en 30 secondes</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="callout callout-blue">
-      <div class="callout-title">À réciter</div>
-      NTL est une <strong>PME logistique</strong> (Hauts-de-France, siège Lille + 3 entrepôts). On a conçu et industrialisé la <strong>base de données de son WMS</strong> : modèle de données, haute dispo / PRA, sécurité, supervision, exploitation.<br><br>
+  <div class="block">
+    <div class="block-title">Le projet en 30 secondes — à réciter</div>
+    <div class="callout c-blue">
+      NTL est une <strong>PME logistique</strong> (Hauts-de-France, siège Lille + 3 entrepôts).
+      On a conçu et industrialisé la <strong>base de données de son WMS</strong> : modèle de données, haute dispo / PRA, sécurité, supervision, exploitation.<br><br>
       Le sujet étant <strong>ambigu</strong> (grossiste ou 3PL ?), on a tranché par un <strong>postulat explicite — grossiste</strong> — et cadré la V1 dessus.<br><br>
-      Résultat : <strong>8 tables, 3NF, 0 trigger</strong>, une archi tenant <strong>RTO 1 h / RPO 15 min</strong>.
+      Résultat : <strong>8 tables, 3NF, 0 trigger</strong>, une archi tenant <strong>RTO 1h / RPO 15min</strong>.
     </div>
-    <div class="a-dire">
-      <div class="a-dire-title">À dire à l'oral — slide contexte</div>
+    <div class="adire">
+      <div class="adire-title">À l'oral</div>
       <ul>
-        <li><strong>Accroche</strong> — "NTL stocke ses marchandises sur 4 sites. Le WMS gère les mouvements. Nous, on a conçu le moteur de données derrière."</li>
-        <li><strong>La difficulté</strong> — "Le sujet était ambigu — on en parle dans quelques minutes, c'est notre point fort."</li>
-        <li><strong>Les chiffres</strong> — "8 tables, RTO 1h, RPO 15min, 6 décisions tracées. Tout est exploitable dès J+1."</li>
+        <li>"NTL stocke ses marchandises sur 4 sites. Le WMS gère les mouvements. On a conçu le moteur de données derrière."</li>
+        <li>"Le sujet était ambigu — on en parle dans quelques minutes, c'est notre point fort."</li>
+        <li>"8 tables, RTO 1h, RPO 15min, 6 décisions tracées. Tout est exploitable dès J+1."</li>
       </ul>
-      <p class="transition">→ Transition : "Commençons par le modèle de données."</p>
     </div>
   </div>
+
+  <div class="block">
+    <div class="block-title">Chiffres-clés — par cœur</div>
+    <div class="tw"><table>
+      <thead><tr><th>Sujet</th><th>Valeur</th><th>Détail</th></tr></thead>
+      <tbody>
+        <tr><td><strong>RTO</strong></td><td><span class="num">1 h</span></td><td>délai max de reprise (réel : 5–40 min)</td></tr>
+        <tr><td><strong>RPO</strong></td><td><span class="num">15 min</span></td><td>perte de données max (binlogs + PITR)</td></tr>
+        <tr><td>Modèle</td><td><span class="num">8 tables</span></td><td>7 entités + 1 table associative <code>commande</code></td></tr>
+        <tr><td>Intégrité</td><td><span class="num">0 trigger · 0 FK composite</span></td><td>FK simples + CHECK + UNIQUE</td></tr>
+        <tr><td>Décisions</td><td><span class="num">6 ADR</span></td><td>sujet exige ≥ 3</td></tr>
+        <tr><td>SGBD</td><td><span class="num">MariaDB 11.4 LTS</span></td><td>LTS jusqu'en 2029</td></tr>
+        <tr><td>Serveurs</td><td><span class="num">3</span></td><td>BDD1 Master · BDD2 Slave HA · BDD3 Slave PRA</td></tr>
+        <tr><td>Budget</td><td><span class="num">76 h (19h × 4)</span></td><td>justifie le périmètre resserré</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Répartition orateurs</div>
+    <div class="tw"><table>
+      <thead><tr><th>Slides</th><th>Sujet</th><th>Orateur(s)</th></tr></thead>
+      <tbody>
+        <tr><td>1–3</td><td>Titre, contexte, démarche</td><td><span class="tag t-blue">Ianis</span></td></tr>
+        <tr><td>4</td><td>Postulat de cadrage (fil rouge)</td><td><span class="tag t-blue">Ianis</span></td></tr>
+        <tr><td>5–6</td><td>MCD + MLD physique</td><td><span class="tag t-blue">Ianis</span> <span class="tag t-green">Blaise</span></td></tr>
+        <tr><td>7–9</td><td>Infrastructure · Topologie HA · PRA</td><td><span class="tag t-orange">Ojvind</span> <span class="tag t-red">Zaid</span></td></tr>
+        <tr><td>10</td><td>Sécurité CODIR</td><td><span class="tag t-red">Zaid</span></td></tr>
+        <tr><td>11–12</td><td>Supervision · Exploitation</td><td><span class="tag t-orange">Ojvind</span> <span class="tag t-red">Zaid</span></td></tr>
+        <tr><td>13–14</td><td>Résultats V2 · Conclusion</td><td><span class="tag t-green">Blaise</span> + équipe</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
 </div>
 
-<!-- ══ 1. CHIFFRES-CLÉS ══ -->
-<div class="section" id="s1">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">1 · Chiffres-clés <span class="tag tag-orange">PAR CŒUR</span></div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Sujet</th><th>Valeur</th><th>Détail</th></tr></thead>
-        <tbody>
-          <tr><td><strong>RTO</strong></td><td><span class="val-key">1 h</span></td><td>Recovery Time Objective — délai max de reprise</td></tr>
-          <tr><td><strong>RPO</strong></td><td><span class="val-key">15 min</span></td><td>Recovery Point Objective — perte max</td></tr>
-          <tr><td>Fenêtre maintenance</td><td><span class="val-key">nuit</span></td><td>Activité 5h30 → 18h30 ouvré</td></tr>
-          <tr><td>Budget</td><td><span class="val-key">19h × 4</span></td><td>Justifie le périmètre resserré</td></tr>
-          <tr><td>Modèle</td><td><span class="val-key">8 tables</span></td><td>7 entités + 1 table associative <code>commande</code></td></tr>
-          <tr><td>Triggers / FK composites</td><td><span class="val-key">0 / 0</span></td><td>Intégrité : FK simples + CHECK + UNIQUE</td></tr>
-          <tr><td>Décisions tracées</td><td><span class="val-key">6 ADR</span></td><td>Sujet exige ≥ 3</td></tr>
-          <tr><td>SGBD</td><td><span class="val-key">MariaDB 11.4 LTS</span></td><td>LTS jusqu'en 2029</td></tr>
-          <tr><td>Serveurs BDD</td><td><span class="val-key">3</span></td><td>BDD1 Master, BDD2 Slave HA, BDD3 Slave PRA</td></tr>
-          <tr><td>Indicateurs supervision</td><td><span class="val-key">5</span></td><td>Latence, connexions, réplication, disque, sauvegardes</td></tr>
-          <tr><td>RTO réel estimé (HA)</td><td><span class="val-key">5–10 min</span></td><td>Tient largement dans la cible 1 h</td></tr>
-          <tr><td>RTO réel estimé (PRA)</td><td><span class="val-key">20–40 min</span></td><td>Tient largement dans la cible 1 h</td></tr>
-        </tbody>
-      </table>
+<!-- ══════════════════════════════════════════════
+     TAB 2 — MODÈLE DE DONNÉES
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-modele">
+
+  <div class="block">
+    <div class="block-title">Schéma relationnel — 8 tables</div>
+    <div class="schema">
+<span class="s-pk">site</span>(<span class="s-pk">id_site</span>, libelle, adresse)<br>
+<span class="s-pk">localisation</span>(<span class="s-pk">id_localisation</span>, <span class="s-uq">code</span>, zone, allee, etage, place, <span class="s-fk">#id_site</span>)<br>
+<span class="s-pk">utilisateur</span>(<span class="s-pk">id_utilisateur</span>, nom, role)<br>
+<span class="s-pk">client</span>(<span class="s-pk">id_client</span>, nom, <span class="s-uq">siret</span>, telephone, status, <span class="s-fk">#id_utilisateur</span>)<br>
+<span class="s-pk">article</span>(<span class="s-pk">id_article</span>, nom, poids[CK>0], fournisseur, type)<br>
+<span class="s-pk">stock</span>(<span class="s-pk">id_stock</span>, quantite, <span class="s-fk">#id_article</span>, <span class="s-fk">#id_localisation</span>) <span class="s-uq">UQ(id_article,id_localisation)</span><br>
+<span class="s-pk">mouvement</span>(<span class="s-pk">id_mouvement</span>, type[CK], <span class="s-uq">reference</span>, date, heure, quantite[CK>0], <span class="s-fk">#id_stock</span>, <span class="s-fk">#id_utilisateur</span>, <span class="s-fk">#id_client</span>[NULL])<br>
+<span class="s-pk">commande</span>(<span class="s-pk">id_commande</span>, <span class="s-fk">#id_client</span>, <span class="s-fk">#id_article</span>, quantite_commandee[CK>0], date_commande)
     </div>
-  </div>
-</div>
-
-<!-- ══ 2. MODÈLE DE DONNÉES ══ -->
-<div class="section" id="s2">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">2 · Modèle de données</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="orateurs"><span class="orateur">Ianis</span><span class="orateur">Blaise</span></div>
-
-    <div class="callout callout-blue">
-      <strong>7 entités :</strong> <code>SITE</code> · <code>LOCALISATION</code> · <code>ARTICLE</code> · <code>CLIENT</code> · <code>STOCK</code> · <code>MOUVEMENT</code> · <code>UTILISATEUR</code><br>
-      <strong>+ 1 associative :</strong> <code>commande</code> (N-N entre CLIENT et ARTICLE)
-    </div>
-
-    <h3>Questions jury — réponses blindées</h3>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi STOCK est une entité ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        <code>stock</code> = <strong>1 article × 1 emplacement × 1 quantité</strong>. Entité réifiée porteuse de la quantité.<br><br>
-        <code>UNIQUE(id_article, id_localisation)</code> garantit une seule ligne par couple. 50 palettes du même article au même endroit = 1 ligne <code>quantite=50</code>, pas 50 lignes.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi <code>mouvement.id_client</code> est nullable ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Issu de l'association <code>CONCERNE</code> (MOUVEMENT 0,1 — CLIENT 0,N).<br>
-        Mouvement <strong>interne</strong> (transfert, inventaire) → pas de client → <code>NULL</code>.<br>
-        Sortie vers un client → <code>id_client</code> renseigné.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Les 4 types de mouvement ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        <code>CHECK (type IN ('entree','sortie','ajustement','transfert'))</code> + <code>quantite &gt; 0</code>.<br><br>
-        La <strong>quantité reste positive</strong>, le <strong>sens</strong> est porté par <code>type</code>. Un mouvement référence <strong>1 seul</strong> <code>id_stock</code>.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi <code>fournisseur</code> en attribut texte et pas une entité ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        La gestion achats/fournisseurs est portée par l'<strong>ERP commercial NTL</strong>, hors périmètre WMS V1.<br>
-        <code>article.fournisseur VARCHAR(100)</code> suffit à tracer l'origine.<br>
-        V2 → entité <code>FOURNISSEUR</code> si intégration WMS.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi des surrogate keys <code>id_*</code> partout ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Standard industriel. <code>INT UNSIGNED</code> (4 octets) → FK légères, jointures rapides, <code>ALTER</code> simple si un code métier change.<br>
-        Les codes métier (<code>siret</code>, <code>code</code>, <code>reference</code>) sont conservés en <code>UNIQUE NOT NULL</code> pour la traçabilité externe.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi <code>ON DELETE RESTRICT</code> partout ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        On ne veut <strong>jamais</strong> détruire un historique de mouvements/stocks en supprimant un client, un article ou un site.<br>
-        Suppression métier = soft-delete applicatif. <code>RESTRICT</code> bloque toute suppression cassante au niveau moteur.
-      </div>
-    </div>
-
-    <h3>Technique — à retenir</h3>
-    <p>• <strong>InnoDB</strong> : seul moteur MariaDB transactionnel avec FK + ACID (MyISAM/Aria ne supportent pas les FK).</p>
-    <p>• <strong><code>utf8mb4</code></strong> : vrai UTF-8 (4 octets) ; <code>utf8</code> MariaDB = 3 octets seulement.</p>
-    <p>• <strong>3NF</strong> respectée. <strong>0 trigger</strong>, <strong>0 FK composite</strong>.</p>
-
-    <div class="callout callout-orange">
-      <div class="callout-title">Honnêteté obligatoire</div>
-      Le DDL n'a <strong>pas encore été exécuté</strong> sur une instance MariaDB 11.4. Plan de tests défini (4 CHECK, 10 FK, UNIQUE, RESTRICT).<br>
-      → dire : <em>« exécution = prochaine étape, notre 1ère perspective V2 »</em>. Ne JAMAIS prétendre l'avoir testé.
-    </div>
-
-    <h3>Schéma physique — 8 tables avec code couleur</h3>
-    <p style="font-size:0.82rem;color:var(--muted);font-family:-apple-system,sans-serif;margin-bottom:0.6rem;">★ = modifié en V2 · <span class="b b-pk">PK</span> <span class="b b-fk">FK</span> <span class="b b-uq">UQ</span> <span class="b b-ck">CK</span> <span class="b b-n">NULL</span></p>
-
-    <div class="mld-grid">
-
-      <!-- site -->
-      <div class="mld-card">
-        <div class="mld-card-header">site</div>
-        <div class="mld-row r-pk"><div class="mld-c1">id_site <span class="b b-pk">PK</span></div><div class="mld-c2">INT UNSIGNED · AUTO_INCREMENT</div></div>
-        <div class="mld-row"><div class="mld-c1">libelle</div><div class="mld-c2">VARCHAR(100) · NOT NULL</div></div>
-        <div class="mld-row"><div class="mld-c1">adresse</div><div class="mld-c2">VARCHAR(255) · NOT NULL</div></div>
-      </div>
-
-      <!-- localisation -->
-      <div class="mld-card">
-        <div class="mld-card-header">localisation</div>
-        <div class="mld-row r-pk"><div class="mld-c1">id_localisation <span class="b b-pk">PK</span></div><div class="mld-c2">INT UNSIGNED · AUTO_INCREMENT</div></div>
-        <div class="mld-row r-uq"><div class="mld-c1">code <span class="b b-uq">UQ</span></div><div class="mld-c2">VARCHAR(30) · NOT NULL</div></div>
-        <div class="mld-row"><div class="mld-c1">zone</div><div class="mld-c2">VARCHAR(30) · NOT NULL</div></div>
-        <div class="mld-row"><div class="mld-c1">allee</div><div class="mld-c2">VARCHAR(10) · NOT NULL</div></div>
-        <div class="mld-row"><div class="mld-c1">etage</div><div class="mld-c2">VARCHAR(10) · NOT NULL</div></div>
-        <div class="mld-row"><div class="mld-c1">place</div><div class="mld-c2">VARCHAR(10) · NOT NULL</div></div>
-        <div class="mld-row r-fk"><div class="mld-c1">id_site <span class="b b-fk">FK</span></div><div class="mld-c2">→ site(id_site) · RESTRICT</div></div>
-      </div>
-
-      <!-- utilisateur -->
-      <div class="mld-card">
-        <div class="mld-card-header">utilisateur</div>
-        <div class="mld-row r-pk"><div class="mld-c1">id_utilisateur <span class="b b-pk">PK</span></div><div class="mld-c2">INT UNSIGNED · AUTO_INCREMENT</div></div>
-        <div class="mld-row"><div class="mld-c1">nom</div><div class="mld-c2">VARCHAR(100) · NOT NULL</div></div>
-        <div class="mld-row"><div class="mld-c1">role</div><div class="mld-c2">VARCHAR(30) · NOT NULL</div></div>
-      </div>
-
-      <!-- client -->
-      <div class="mld-card">
-        <div class="mld-card-header">client</div>
-        <div class="mld-row r-pk"><div class="mld-c1">id_client <span class="b b-pk">PK</span></div><div class="mld-c2">INT UNSIGNED · AUTO_INCREMENT</div></div>
-        <div class="mld-row"><div class="mld-c1">nom</div><div class="mld-c2">VARCHAR(100) · NOT NULL</div></div>
-        <div class="mld-row r-uq"><div class="mld-c1">siret <span class="b b-uq">UQ</span></div><div class="mld-c2">CHAR(14) · NOT NULL</div></div>
-        <div class="mld-row r-null"><div class="mld-c1">telephone <span class="b b-n">NULL</span></div><div class="mld-c2">VARCHAR(20)</div></div>
-        <div class="mld-row"><div class="mld-c1">status</div><div class="mld-c2">VARCHAR(20) · NOT NULL · DEFAULT 'actif'</div></div>
-        <div class="mld-row r-fk"><div class="mld-c1">id_utilisateur <span class="b b-fk">FK</span></div><div class="mld-c2">→ utilisateur · RESTRICT</div></div>
-      </div>
-
-      <!-- article -->
-      <div class="mld-card">
-        <div class="mld-card-header">article</div>
-        <div class="mld-row r-pk"><div class="mld-c1">id_article <span class="b b-pk">PK</span></div><div class="mld-c2">INT UNSIGNED · AUTO_INCREMENT</div></div>
-        <div class="mld-row"><div class="mld-c1">nom</div><div class="mld-c2">VARCHAR(150) · NOT NULL</div></div>
-        <div class="mld-row r-ck"><div class="mld-c1">poids <span class="b b-ck">CK</span></div><div class="mld-c2">DECIMAL(10,3) · NOT NULL · &gt; 0</div></div>
-        <div class="mld-row r-null"><div class="mld-c1">fournisseur <span class="b b-n">NULL</span></div><div class="mld-c2">VARCHAR(100) · (texte libre ERP)</div></div>
-        <div class="mld-row"><div class="mld-c1">type</div><div class="mld-c2">VARCHAR(50) · NOT NULL</div></div>
-      </div>
-
-      <!-- stock ★ -->
-      <div class="mld-card">
-        <div class="mld-card-header">stock <span class="mld-star">★ V2</span></div>
-        <div class="mld-row r-pk"><div class="mld-c1">id_stock <span class="b b-pk">PK</span></div><div class="mld-c2">INT UNSIGNED · AUTO_INCREMENT</div></div>
-        <div class="mld-row"><div class="mld-c1">quantite</div><div class="mld-c2">INT UNSIGNED · NOT NULL · DEFAULT 0</div></div>
-        <div class="mld-row r-fk"><div class="mld-c1">id_article <span class="b b-fk">FK</span></div><div class="mld-c2">→ article · NOT NULL · RESTRICT</div></div>
-        <div class="mld-row r-fk"><div class="mld-c1">id_localisation <span class="b b-fk">FK</span></div><div class="mld-c2">→ localisation · NOT NULL · RESTRICT</div></div>
-        <div class="mld-row r-uq"><div class="mld-c1">— <span class="b b-uq">UQ</span></div><div class="mld-c2">UNIQUE(id_article, id_localisation) ★</div></div>
-      </div>
-
-      <!-- mouvement ★ -->
-      <div class="mld-card" style="grid-column: span 2;">
-        <div class="mld-card-header">mouvement <span class="mld-star">★ V2</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;">
-          <div>
-            <div class="mld-row r-pk"><div class="mld-c1">id_mouvement <span class="b b-pk">PK</span></div><div class="mld-c2">INT UNSIGNED · AUTO_INCREMENT</div></div>
-            <div class="mld-row r-ck"><div class="mld-c1">type <span class="b b-ck">CK</span></div><div class="mld-c2">IN('entree','sortie','ajustement','transfert')</div></div>
-            <div class="mld-row r-uq"><div class="mld-c1">reference <span class="b b-uq">UQ</span></div><div class="mld-c2">VARCHAR(50) · NOT NULL</div></div>
-            <div class="mld-row"><div class="mld-c1">date</div><div class="mld-c2">DATE · NOT NULL</div></div>
-            <div class="mld-row"><div class="mld-c1">heure</div><div class="mld-c2">TIME · NOT NULL</div></div>
-          </div>
-          <div>
-            <div class="mld-row r-ck"><div class="mld-c1">quantite <span class="b b-ck">CK</span></div><div class="mld-c2">INT UNSIGNED · NOT NULL · &gt; 0 ★</div></div>
-            <div class="mld-row r-fk"><div class="mld-c1">id_stock <span class="b b-fk">FK</span></div><div class="mld-c2">→ stock · NOT NULL · RESTRICT ★</div></div>
-            <div class="mld-row r-fk"><div class="mld-c1">id_utilisateur <span class="b b-fk">FK</span></div><div class="mld-c2">→ utilisateur · NOT NULL · RESTRICT</div></div>
-            <div class="mld-row r-fk r-null"><div class="mld-c1">id_client <span class="b b-fk">FK</span> <span class="b b-n">NULL</span></div><div class="mld-c2">→ client · NULL (mvt interne) ★</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- commande -->
-      <div class="mld-card" style="grid-column: span 2;">
-        <div class="mld-card-header">commande — table associative (CLIENT ↔ ARTICLE)</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;">
-          <div>
-            <div class="mld-row r-pk"><div class="mld-c1">id_commande <span class="b b-pk">PK</span></div><div class="mld-c2">INT UNSIGNED · AUTO_INCREMENT</div></div>
-            <div class="mld-row r-fk"><div class="mld-c1">id_client <span class="b b-fk">FK</span></div><div class="mld-c2">→ client · NOT NULL · RESTRICT</div></div>
-          </div>
-          <div>
-            <div class="mld-row r-fk"><div class="mld-c1">id_article <span class="b b-fk">FK</span></div><div class="mld-c2">→ article · NOT NULL · RESTRICT</div></div>
-            <div class="mld-row r-ck"><div class="mld-c1">quantite_commandee <span class="b b-ck">CK</span></div><div class="mld-c2">INT UNSIGNED · NOT NULL · &gt; 0</div></div>
-            <div class="mld-row"><div class="mld-c1">date_commande</div><div class="mld-c2">DATETIME · NOT NULL · DEFAULT NOW()</div></div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /mld-grid -->
-
-    <div class="callout callout-blue" style="margin-top:0.8rem;">
-      <strong>Moteur InnoDB</strong> · Charset <code>utf8mb4</code> · Collation <code>utf8mb4_unicode_ci</code> · <strong>ON DELETE RESTRICT partout</strong> · 10 FK · 4 CHECK · 4 UNIQUE
-    </div>
-
-    <h3>Questions complémentaires jury</h3>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Que se passe-t-il si on déplace des palettes ? Le UNIQUE(id_article, id_localisation) bloque ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Non. Un déplacement = <code>UPDATE stock SET id_localisation = X WHERE id_stock = Y</code>.<br>
-        Le UNIQUE garantit qu'il n'existe pas déjà une ligne pour ce couple article × nouvelle localisation.<br>
-        Si c'est le cas (fusion de stocks) → logique applicative : <code>UPDATE stock SET quantite = quantite + N WHERE ...</code> + suppression de l'ancienne ligne.<br>
-        La BDD ne bloque pas, elle <strong>protège la cohérence</strong>. La règle métier est dans l'applicatif.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Comment gérez-vous les transactions / la concurrence sur les stocks ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        InnoDB → transactions ACID native. Exemple d'une sortie stock :<br>
-        <code>BEGIN → SELECT FOR UPDATE stock → UPDATE stock.quantite → INSERT mouvement → COMMIT</code><br>
-        Si échec : <code>ROLLBACK</code> automatique. Pas de stock négatif possible si le <code>SELECT FOR UPDATE</code> vérifie la quantité disponible avant le UPDATE.<br>
-        Isolation par défaut : <strong>REPEATABLE READ</strong> sous MariaDB.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi pas de trigger pour mettre à jour stock.quantite automatiquement ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Deux raisons :<br>
-        1. <strong>ADR 0001</strong> : bug MariaDB sur CHECK + trigger combinés avec InnoDB (comportement non garanti sur versions &lt; 10.5). On a supprimé les triggers pour éviter ce risque.<br>
-        2. <strong>Maintenabilité</strong> : les triggers cachent la logique métier, compliquent le debugging et le monitoring. La couche applicative est plus transparente et testable.<br>
-        La cohérence est garantie par FK + CHECK + transactions ACID. Pas besoin de trigger.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">La table commande n'a que quantite_commandee et date_commande — c'est trop minimal ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Oui, c'est minimal et <strong>assumé</strong>.<br>
-        La gestion complète des commandes (statut, livraison, prix, facturation) est portée par l'<strong>ERP commercial NTL</strong> — hors périmètre WMS V1.<br>
-        Notre WMS gère le <strong>mouvement physique des stocks</strong>. La table commande sert uniquement à répondre à "qu'a commandé ce client ?". Évite la duplication fonctionnelle avec l'ERP.<br>
-        V2 : enrichissement possible si intégration ERP (statut, référence commande ERP, multi-lignes).
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">50 palettes du même article sur 3 emplacements différents — comment vous gérez ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        → 3 lignes dans <code>stock</code> (1 par emplacement), pas 1 seule.<br>
-        UNIQUE(id_article, id_localisation) garantit pas de doublon par emplacement.<br>
-        Stock total de l'article : <code>SELECT SUM(quantite) FROM stock WHERE id_article = X</code>.<br>
-        Stock par localisation : <code>SELECT * FROM stock WHERE id_article = X</code> → 3 lignes avec quantités différentes.<br>
-        C'est le cœur du modèle : <strong>granularité article × emplacement</strong>.
-      </div>
-    </div>
-
-    <div class="a-dire">
-      <div class="a-dire-title">À dire à l'oral — slide modèle de données</div>
+    <p style="font-size:0.78rem;color:var(--muted);">
+      <span style="color:#7a5a00;font-weight:700;">PK soulignée</span> ·
+      <span style="color:var(--blue);">#FK</span> ·
+      <span style="color:#4a2a8c;">UQ unicité</span> ·
+      [CK contrainte] · InnoDB · utf8mb4 · ON DELETE RESTRICT partout
+    </p>
+    <div class="adire">
+      <div class="adire-title">À l'oral</div>
       <ul>
-        <li><strong>Intro</strong> — "7 entités pour couvrir l'essentiel d'un WMS : les marchandises, où elles sont, qui les bouge, pour qui."</li>
-        <li><strong>Choix fort</strong> — "STOCK est une entité réifiée : 1 ligne = 1 article × 1 emplacement × 1 quantité. Ça permet de répondre à 'combien d'unités de l'article A à l'emplacement E ?'"</li>
-        <li><strong>Nullable</strong> — "MOUVEMENT.id_client est nullable : les transferts internes entre emplacements n'ont pas de client destinataire."</li>
-        <li><strong>Défense</strong> — "Zéro trigger, zéro FK composite. On maximise la lisibilité pour une équipe IT sans DBA dédié."</li>
+        <li>"7 entités pour couvrir l'essentiel du WMS. STOCK est une entité réifiée : 1 ligne = 1 article × 1 emplacement × 1 quantité."</li>
+        <li>"MOUVEMENT.id_client est nullable : les transferts internes n'ont pas de client destinataire."</li>
+        <li>"Zéro trigger, zéro FK composite — lisibilité maximale pour une équipe IT sans DBA dédié."</li>
       </ul>
-      <p class="transition">→ Transition : "Voyons maintenant l'architecture qui supporte cette base."</p>
+      <p class="tr">→ "Voyons maintenant l'architecture qui supporte cette base."</p>
     </div>
   </div>
+
+  <div class="block">
+    <div class="block-title">Questions jury — modèle</div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi STOCK est une entité et pas un attribut ? <span class="chev">▼</span></div>
+      <div class="qa-a"><code>stock</code> = <strong>1 article × 1 emplacement × 1 quantité</strong>. Entité réifiée. UNIQUE(id_article, id_localisation) garantit une seule ligne par couple. 50 palettes du même article = 1 ligne <code>quantite=50</code>, pas 50 lignes.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi mouvement.id_client est nullable ? <span class="chev">▼</span></div>
+      <div class="qa-a">Association CONCERNE (MOUVEMENT 0,1 — CLIENT 0,N). Mouvement <strong>interne</strong> (transfert, inventaire) → pas de client → NULL autorisé. Sortie vers client → id_client renseigné.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Les 4 types de mouvement ? <span class="chev">▼</span></div>
+      <div class="qa-a"><code>CHECK type IN ('entree','sortie','ajustement','transfert')</code> + <code>quantite > 0</code>. La quantité reste <strong>toujours positive</strong>, le sens est porté par <code>type</code>. 1 mouvement = 1 stock.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi fournisseur en attribut texte et pas une entité ? <span class="chev">▼</span></div>
+      <div class="qa-a">La gestion achats est portée par l'<strong>ERP commercial NTL</strong>, hors WMS V1. <code>VARCHAR(100)</code> suffit à tracer l'origine. V2 : entité FOURNISSEUR si intégration.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi ON DELETE RESTRICT partout ? <span class="chev">▼</span></div>
+      <div class="qa-a">On ne veut <strong>jamais</strong> détruire un historique en supprimant un client ou un article. Suppression métier = soft-delete applicatif. RESTRICT bloque au niveau moteur.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Que se passe-t-il si on déplace des palettes ? Le UNIQUE bloque ? <span class="chev">▼</span></div>
+      <div class="qa-a">Non. Un déplacement = <code>UPDATE stock SET id_localisation = X</code>. Si le couple existe déjà → fusion de quantités côté applicatif. La BDD protège la cohérence, la logique métier est dans l'appli.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Comment gérez-vous les transactions / la concurrence ? <span class="chev">▼</span></div>
+      <div class="qa-a">InnoDB → transactions ACID. Sortie stock : <code>BEGIN → SELECT FOR UPDATE → UPDATE stock.quantite → INSERT mouvement → COMMIT</code>. Échec → ROLLBACK. Isolation REPEATABLE READ par défaut.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi pas de trigger pour mettre à jour stock.quantite ? <span class="chev">▼</span></div>
+      <div class="qa-a">1. ADR 0001 : bug MariaDB CHECK + trigger sur InnoDB. 2. Les triggers cachent la logique métier, compliquent le debug. Cohérence garantie par FK + CHECK + transactions ACID.</div>
+    </div>
+
+    <div class="callout c-orange" style="margin-top:0.8rem;">
+      <strong>Honnêteté obligatoire :</strong> le DDL n'a pas encore été exécuté sur MariaDB 11.4. Dire : <em>« c'est notre première perspective V2 »</em>. Ne jamais prétendre l'avoir testé.
+    </div>
+  </div>
+
 </div>
 
-<!-- ══ 3. ARCHITECTURE HA / PRA ══ -->
-<div class="section" id="s3">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">3 · Architecture HA / PRA</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="orateurs"><span class="orateur">Ojvind</span><span class="orateur">Zaid</span></div>
+<!-- ══════════════════════════════════════════════
+     TAB 3 — ARCHITECTURE
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-archi">
 
-    <div class="callout callout-blue" style="font-family: 'Courier New', monospace; font-size: 0.82rem; line-height: 1.9;">
-      WMS-APP → HAProxy → BDD1 (Master) ──► BDD2 (Slave HA, local Lille)<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──► BDD3 (Slave PRA, distant)
+  <div class="block">
+    <div class="block-title">Topologie — 3 serveurs MariaDB</div>
+    <div class="schema">
+WMS-APP  →  HAProxy  →  BDD1 (Master, Lille, écritures)
+                              ├──► BDD2 (Slave HA, Lille local)
+                              └──► BDD3 (Slave PRA, site distant)
+
+Réplication : asynchrone · binlogs · faible impact master
     </div>
+    <div class="tw"><table>
+      <thead><tr><th>Serveur</th><th>OS</th><th>SGBD</th><th>CPU/RAM</th><th>RTO si tombé</th></tr></thead>
+      <tbody>
+        <tr><td><strong>BDD1 Master</strong></td><td>Ubuntu 22.04 LTS</td><td>MariaDB 11.4 LTS</td><td>2–4 vCPU · 8–16 Go</td><td>—</td></tr>
+        <tr><td><strong>BDD2 Slave HA</strong></td><td>Ubuntu 22.04 LTS</td><td>MariaDB 11.4 LTS</td><td>2–4 vCPU · 8–16 Go</td><td><span class="num">5–10 min</span></td></tr>
+        <tr><td><strong>BDD3 Slave PRA</strong></td><td>Ubuntu 22.04 LTS</td><td>MariaDB 11.4 LTS</td><td>2–4 vCPU · 8–16 Go</td><td><span class="num">20–40 min</span></td></tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:0.82rem;color:var(--muted);">HAProxy 2.x · mariabackup · Prometheus · Grafana · mysqld_exporter · node_exporter</p>
 
-    <p>• <strong>BDD1</strong> : reçoit toutes les écritures (production).</p>
-    <p>• <strong>BDD2</strong> : réplication locale → couvre panne service/VM du master.</p>
-    <p>• <strong>BDD3</strong> : réplication distante → couvre perte du site Lille.</p>
-    <p>• Réplication <strong>asynchrone</strong> + <strong>binlogs</strong> (faible impact master, simple à exploiter). RPO 15 min garanti par les binlogs (PITR).</p>
-
-    <h3>Scénarios de bascule</h3>
-    <div class="scenario"><span>Panne service MariaDB BDD1</span><span class="scenario-rto">5–10 min ✓</span></div>
-    <div class="scenario"><span>Perte VM BDD1</span><span class="scenario-rto">5–10 min ✓</span></div>
-    <div class="scenario"><span>Perte site Lille</span><span class="scenario-rto">20–40 min ✓</span></div>
-    <div class="scenario"><span>Corruption logique</span><span class="scenario-rto">selon volume</span></div>
-
-    <h3>Conditions avant bascule HA</h3>
-    <div class="callout callout-green">
-      Vérifier : <code>Slave_IO_Running=Yes</code> · <code>Slave_SQL_Running=Yes</code> · <code>Seconds_Behind_Master=0</code>
+    <div class="callout c-green" style="margin-top:0.7rem;">
+      Avant bascule HA — vérifier : <code>Slave_IO_Running=Yes</code> · <code>Slave_SQL_Running=Yes</code> · <code>Seconds_Behind_Master=0</code>
     </div>
-
-    <h3>Sauvegardes</h3>
-    <p>• Complète quotidienne (<code>mariabackup</code>) + binlogs 48 h + configs MariaDB/HAProxy.</p>
-    <p>• Tests planifiés : bascule HA <strong>trimestrielle</strong> · bascule PRA <strong>semestrielle</strong> · restauration <strong>mensuelle</strong>.</p>
-
-    <h3>Questions complémentaires jury</h3>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Si HAProxy tombe, que se passe-t-il ? C'est un SPOF non ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Oui, <strong>HAProxy est un SPOF assumé en V1</strong>. On le reconnaît explicitement.<br>
-        V1 : procédure runbook de bascule DNS manuelle (modifier le A record → pointer direct sur BDD2).<br>
-        V2 : HAProxy en cluster actif/passif avec <strong>Keepalived + VIP</strong> (Virtual IP). Si le HAProxy actif tombe, Keepalived bascule la VIP sur le passif en quelques secondes.<br>
-        Pourquoi pas en V1 ? Budget 76h. Keepalived = complexité opérationnelle supplémentaire. Priorisé en V2.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Le RPO 15 min — c'est garanti comment exactement ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Deux mécanismes combinés :<br>
-        1. <strong>sync_binlog=1</strong> → chaque transaction validée est physiquement écrite dans le binlog <em>avant</em> retour au client. Pas de perte au niveau du master.<br>
-        2. <strong>PITR (Point-In-Time Recovery)</strong> → sauvegarde complète quotidienne + binlogs conservés 48h. En cas de corruption : restauration dump + relecture des binlogs jusqu'au moment T.<br>
-        En HA locale (BDD2), le slave est quasi temps-réel (<code>Seconds_Behind_Master ≈ 0</code>) → RPO pratique de quelques secondes.<br>
-        Le RPO 15 min est une cible <strong>max</strong> pour le pire cas (perte site + relecture binlogs).
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Réplication asynchrone — risque de split-brain ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        En réplication async classique (1 master, N slaves), <strong>pas de split-brain</strong> au sens strict : il n'y a qu'un seul master qui accepte les écritures.<br>
-        Le risque en async = <strong>lag de réplication</strong> : si BDD1 tombe avec un lag, BDD2 n'a pas les dernières transactions → perte possible dans la fenêtre du lag.<br>
-        C'est pourquoi on vérifie <code>Seconds_Behind_Master=0</code> avant toute bascule intentionnelle.<br>
-        Split-brain réel → problème de Galera/Paxos (V2). En V1, la promotion de BDD2 en master est <strong>manuelle + runbook</strong>, ce qui élimine le split-brain par conception.
-      </div>
-    </div>
-
-    <div class="a-dire">
-      <div class="a-dire-title">À dire à l'oral — slide architecture</div>
+    <div class="adire">
+      <div class="adire-title">À l'oral</div>
       <ul>
-        <li><strong>Schéma</strong> — "3 serveurs MariaDB en réplication asynchrone. BDD1 prend toutes les écritures, BDD2 couvre la HA locale, BDD3 couvre la perte de site."</li>
-        <li><strong>HAProxy</strong> — "HAProxy est le point d'entrée unique. Il détecte la panne de BDD1 et redirige vers BDD2 sans intervention manuelle."</li>
-        <li><strong>Chiffres</strong> — "RTO réel : 5 à 10 minutes en HA. 20 à 40 en PRA. On est très confortable sous la cible d'une heure."</li>
-        <li><strong>Honnêteté</strong> — "HAProxy est un SPOF en V1 — on le reconnaît, la V2 l'adresse avec Keepalived."</li>
+        <li>"3 serveurs MariaDB en réplication asynchrone. BDD1 prend toutes les écritures, BDD2 couvre la HA locale, BDD3 couvre la perte de site."</li>
+        <li>"RTO réel : 5–10 min en HA, 20–40 min en PRA. On est très confortable sous la cible 1h."</li>
+        <li>"HAProxy est un SPOF en V1 — on le reconnaît, Keepalived le corrige en V2."</li>
       </ul>
-      <p class="transition">→ Transition : "La supervision permet de détecter les anomalies avant la bascule."</p>
     </div>
   </div>
+
+  <div class="block">
+    <div class="block-title">Scénarios de bascule</div>
+    <div class="tw"><table>
+      <thead><tr><th>Scénario</th><th>Action</th><th>RTO</th></tr></thead>
+      <tbody>
+        <tr><td>Panne service MariaDB BDD1</td><td>Bascule HAProxy → BDD2</td><td><span class="num" style="color:var(--green);">5–10 min</span></td></tr>
+        <tr><td>Perte VM BDD1</td><td>Promotion BDD2 en master</td><td><span class="num" style="color:var(--green);">5–10 min</span></td></tr>
+        <tr><td>Perte site Lille</td><td>Bascule BDD3 (PRA distant)</td><td><span class="num" style="color:var(--orange);">20–40 min</span></td></tr>
+        <tr><td>Corruption logique</td><td>Restauration dump + binlogs PITR</td><td><span class="num" style="color:var(--red);">selon volume</span></td></tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:0.82rem;margin-top:0.5rem;">Sauvegardes : complète quotidienne 02h00 · binlogs 48h · rétention 14j · externalisation NAS<br>
+    Tests : bascule HA <strong>trimestrielle</strong> · bascule PRA <strong>semestrielle</strong> · restauration <strong>mensuelle</strong></p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Questions jury — architecture</div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Si HAProxy tombe — SPOF ? <span class="chev">▼</span></div>
+      <div class="qa-a"><strong>Oui, SPOF assumé en V1.</strong> Procédure runbook : bascule DNS manuelle (A record → BDD2). V2 : HAProxy actif/passif + Keepalived + VIP. Non fait en V1 faute de temps — tracé et assumé.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Le RPO 15min — garanti comment ? <span class="chev">▼</span></div>
+      <div class="qa-a"><code>sync_binlog=1</code> → chaque transaction est écrite dans le binlog avant retour client. PITR (Point-In-Time Recovery) : dump + relecture binlogs jusqu'à T. En HA locale BDD2 ≈ temps-réel. RPO 15min = pire cas (perte site + relecture binlogs).</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Réplication async — risque de split-brain ? <span class="chev">▼</span></div>
+      <div class="qa-a">Pas de split-brain en réplication 1 master / N slaves : un seul master accepte les écritures. Le risque est le <strong>lag de réplication</strong> (transactions non encore propagées). La promotion de BDD2 est manuelle + runbook → élimine le split-brain par design. Galera (V2) automatise le consensus.</div>
+    </div>
+  </div>
+
 </div>
 
-<!-- ══ 3b. INFRASTRUCTURE TECHNIQUE ══ -->
-<div class="section" id="s3b">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">3b · Infrastructure technique — OS, versions, matériel</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="orateurs"><span class="orateur">Ojvind</span></div>
+<!-- ══════════════════════════════════════════════
+     TAB 4 — SÉCURITÉ & SUPERVISION
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-secu">
 
-    <div class="server-grid">
-      <div class="srv-card">
-        <div class="srv-header srv-master">BDD1 — MASTER</div>
-        <div class="srv-body">
-          <div class="srv-row"><span class="srv-lbl">Rôle</span><span class="srv-val">Production · toutes les écritures</span></div>
-          <div class="srv-row"><span class="srv-lbl">OS</span><span class="srv-val">Ubuntu Server 22.04 LTS</span></div>
-          <div class="srv-row"><span class="srv-lbl">SGBD</span><span class="srv-val">MariaDB 11.4 LTS</span></div>
-          <div class="srv-row"><span class="srv-lbl">LTS jusqu'au</span><span class="srv-val">2029</span></div>
-          <div class="srv-row"><span class="srv-lbl">CPU</span><span class="srv-val">2–4 vCPU</span></div>
-          <div class="srv-row"><span class="srv-lbl">RAM</span><span class="srv-val">8–16 Go</span></div>
-          <div class="srv-row"><span class="srv-lbl">Stockage</span><span class="srv-val">SSD · vol. data/logs séparés</span></div>
-          <div class="srv-row"><span class="srv-lbl">Réseau</span><span class="srv-val">1 Gbit/s · Siège Lille</span></div>
-          <div class="srv-row"><span class="srv-lbl">Sauvegarde</span><span class="srv-val">mariabackup 02h00 → NAS</span></div>
-        </div>
-      </div>
-
-      <div class="srv-card">
-        <div class="srv-header srv-ha">BDD2 — SLAVE HA</div>
-        <div class="srv-body">
-          <div class="srv-row"><span class="srv-lbl">Rôle</span><span class="srv-val">Réplication locale · haute dispo</span></div>
-          <div class="srv-row"><span class="srv-lbl">OS</span><span class="srv-val">Ubuntu Server 22.04 LTS</span></div>
-          <div class="srv-row"><span class="srv-lbl">SGBD</span><span class="srv-val">MariaDB 11.4 LTS</span></div>
-          <div class="srv-row"><span class="srv-lbl">LTS jusqu'au</span><span class="srv-val">2029</span></div>
-          <div class="srv-row"><span class="srv-lbl">CPU</span><span class="srv-val">2–4 vCPU</span></div>
-          <div class="srv-row"><span class="srv-lbl">RAM</span><span class="srv-val">8–16 Go</span></div>
-          <div class="srv-row"><span class="srv-lbl">Stockage</span><span class="srv-val">SSD · même LAN que BDD1</span></div>
-          <div class="srv-row"><span class="srv-lbl">Réseau</span><span class="srv-val">1 Gbit/s · Siège Lille</span></div>
-          <div class="srv-row"><span class="srv-lbl">RTO si BDD1 down</span><span class="srv-val">5–10 min</span></div>
-        </div>
-      </div>
-
-      <div class="srv-card">
-        <div class="srv-header srv-pra">BDD3 — SLAVE PRA</div>
-        <div class="srv-body">
-          <div class="srv-row"><span class="srv-lbl">Rôle</span><span class="srv-val">Réplication distante · PRA</span></div>
-          <div class="srv-row"><span class="srv-lbl">OS</span><span class="srv-val">Ubuntu Server 22.04 LTS</span></div>
-          <div class="srv-row"><span class="srv-lbl">SGBD</span><span class="srv-val">MariaDB 11.4 LTS</span></div>
-          <div class="srv-row"><span class="srv-lbl">LTS jusqu'au</span><span class="srv-val">2029</span></div>
-          <div class="srv-row"><span class="srv-lbl">CPU</span><span class="srv-val">2–4 vCPU</span></div>
-          <div class="srv-row"><span class="srv-lbl">RAM</span><span class="srv-val">8–16 Go</span></div>
-          <div class="srv-row"><span class="srv-lbl">Stockage</span><span class="srv-val">SSD · site distant (hors Lille)</span></div>
-          <div class="srv-row"><span class="srv-lbl">Réseau</span><span class="srv-val">1 Gbit/s · WAN chiffré</span></div>
-          <div class="srv-row"><span class="srv-lbl">RTO si perte site</span><span class="srv-val">20–40 min</span></div>
-        </div>
-      </div>
-    </div>
-
-    <h3>Composants transverses</h3>
-    <div class="stack-row">
-      <div class="stack-pill"><strong>HAProxy 2.x</strong> — load balancer + health check</div>
-      <div class="stack-pill"><strong>Prometheus</strong> — collecte métriques</div>
-      <div class="stack-pill"><strong>Grafana</strong> — dashboards + alertes</div>
-      <div class="stack-pill"><strong>mysqld_exporter</strong> — métriques MariaDB</div>
-      <div class="stack-pill"><strong>node_exporter</strong> — métriques OS</div>
-      <div class="stack-pill"><strong>mariabackup</strong> — sauvegardes à chaud</div>
-      <div class="stack-pill"><strong>NAS</strong> — rétention 14 jours</div>
-    </div>
-
-    <h3>Paramètres MariaDB clés</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Paramètre</th><th>Valeur</th><th>Justification</th></tr></thead>
-        <tbody>
-          <tr><td><code>innodb_buffer_pool_size</code></td><td>≈ 60 % RAM</td><td>Cache InnoDB — performance lecture</td></tr>
-          <tr><td><code>sync_binlog</code></td><td>1</td><td>Durabilité binlog — RPO garanti</td></tr>
-          <tr><td><code>innodb_flush_log_at_trx_commit</code></td><td>2</td><td>Compromis perf / durabilité</td></tr>
-          <tr><td><code>slow_query_log</code></td><td>ON · seuil 200 ms</td><td>Détection requêtes lentes</td></tr>
-          <tr><td>Binlogs retenus</td><td>48 h</td><td>Permet PITR + RPO 15 min</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Comptes MariaDB</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Compte</th><th>Droits</th><th>Restriction</th></tr></thead>
-        <tbody>
-          <tr><td><code>appuser</code></td><td>SELECT · INSERT · UPDATE · DELETE</td><td>Limité par IP · pas de DDL</td></tr>
-          <tr><td><code>replicator</code></td><td>REPLICATION SLAVE</td><td>Utilisé par BDD2 et BDD3</td></tr>
-          <tr><td><code>dba</code></td><td>ALL PRIVILEGES sur schéma WMS</td><td>SSH + MFA obligatoire</td></tr>
-          <tr><td><code>backup</code></td><td>SELECT · LOCK TABLES · RELOAD</td><td>Accès NAS restreint</td></tr>
-          <tr><td><code>root</code></td><td>ALL (système)</td><td>localhost uniquement</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 4. SUPERVISION ══ -->
-<div class="section" id="s4">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">4 · Supervision</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="orateurs"><span class="orateur">Ojvind</span></div>
-
-    <p style="margin-bottom:0.6rem;font-family:-apple-system,sans-serif;font-size:0.88rem;">Stack : <strong>Prometheus + Grafana</strong> · <code>mysqld_exporter</code> + <code>node_exporter</code> · Slow Query Log</p>
-
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Indicateur</th><th>Normal</th><th>Alerte</th><th>Critique</th></tr></thead>
-        <tbody>
-          <tr><td>Latence SQL</td><td>&lt; 50 ms</td><td>&gt; 150 ms</td><td>&gt; 300 ms</td></tr>
-          <tr><td>Connexions actives</td><td>&lt; 50</td><td>&gt; 100</td><td>&gt; 150</td></tr>
-          <tr><td>Réplication (retard)</td><td>0–5 s</td><td>&gt; 15 s</td><td>&gt; 30 s</td></tr>
-          <tr><td>Espace disque libre</td><td>&gt; 20 %</td><td>&lt; 15 %</td><td>&lt; 10 %</td></tr>
-          <tr><td>Succès sauvegardes</td><td>100 %</td><td>1 échec</td><td>&gt; 1 échec</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout callout-orange">
-      <strong>Lier les seuils à l'objectif :</strong><br>
-      • Réplication &gt; 30 s → <strong>RPO 15 min menacé</strong><br>
-      • Disque &lt; 10 % → <strong>arrêt MariaDB possible</strong>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 5. SÉCURITÉ ══ -->
-<div class="section" id="s5">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">5 · Sécurité — Note CODIR</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="orateurs"><span class="orateur">Zaid</span></div>
-
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>#</th><th>Risque</th><th>Gravité</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>Arrêt prolongé de la base (4 sites bloqués)</td><td><span class="tag tag-red">Critique</span></td></tr>
-          <tr><td>2</td><td>Vol d'un accès applicatif</td><td><span class="tag tag-red">Critique</span></td></tr>
-          <tr><td>3</td><td>Ransomware + sauvegardes inutilisables</td><td><span class="tag tag-red">Critique</span></td></tr>
-          <tr><td>4</td><td>Exfiltration des données clients</td><td><span class="tag tag-orange">Élevée</span></td></tr>
-          <tr><td>5</td><td>Perte de traçabilité réglementaire</td><td><span class="tag tag-orange">Élevée</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Plan d'action</h3>
-    <p><strong>P1 – immédiat (6 sem.) :</strong> sauvegardes externalisées <strong>3-2-1</strong> · restauration testée mensuellement · cluster HA · <strong>MFA admin</strong> · secrets en coffre.</p>
-    <p><strong>P2 – 3 mois :</strong> cloisonnement des accès (<strong>moindre privilège</strong>) · <strong>audit log inviolable</strong> 12 mois · runbook incident.</p>
-    <p><strong>P3 – 6 mois :</strong> exercice de crise · assurance cyber · sensibilisation.</p>
-
-    <div class="callout callout-blue">
-      <strong>RGPD :</strong> notification sous <strong>72 h</strong> en cas de fuite. Impacts qualitatifs (BIA non chiffrée → assumé, pas un manque).
-    </div>
-    <div class="a-dire">
-      <div class="a-dire-title">À dire à l'oral — slide sécurité</div>
+  <div class="block">
+    <div class="block-title">Sécurité — Note CODIR · 5 risques · 3 horizons</div>
+    <div class="tw"><table>
+      <thead><tr><th>#</th><th>Risque</th><th>Gravité</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Arrêt prolongé de la base (4 sites bloqués)</td><td><span class="tag t-red">Critique</span></td></tr>
+        <tr><td>2</td><td>Vol d'un accès applicatif</td><td><span class="tag t-red">Critique</span></td></tr>
+        <tr><td>3</td><td>Ransomware + sauvegardes compromises</td><td><span class="tag t-red">Critique</span></td></tr>
+        <tr><td>4</td><td>Exfiltration des données clients</td><td><span class="tag t-orange">Élevée</span></td></tr>
+        <tr><td>5</td><td>Perte de traçabilité réglementaire</td><td><span class="tag t-orange">Élevée</span></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>P1 (6 sem.) :</strong> sauvegardes 3-2-1 · MFA admin · cluster HA · coffre secrets</p>
+    <p><strong>P2 (3 mois) :</strong> moindre privilège · audit log inviolable 12 mois</p>
+    <p><strong>P3 (6 mois) :</strong> exercice crise · assurance cyber · sensibilisation</p>
+    <div class="callout c-blue" style="margin-top:0.6rem;"><strong>RGPD :</strong> notification CNIL sous <strong>72h</strong> en cas de fuite. BIA non chiffrée → assumé, impacts qualitatifs.</div>
+    <div class="adire">
+      <div class="adire-title">À l'oral</div>
       <ul>
-        <li><strong>Format</strong> — "On a livré une note de direction CODIR : 5 risques priorisés, 3 horizons d'action, pas une liste technique pour nous."</li>
-        <li><strong>Criticité</strong> — "Les 3 risques critiques : arrêt BDD (4 sites bloqués), vol d'accès applicatif, ransomware avec sauvegardes compromises."</li>
-        <li><strong>P1</strong> — "P1 c'est l'urgence à 6 semaines : règle 3-2-1 pour les sauvegardes, MFA sur les comptes admin, cluster HA."</li>
-        <li><strong>RGPD</strong> — "On a explicitement mentionné l'obligation de notification CNIL sous 72h — le jury appréciera."</li>
+        <li>"On a livré une note de direction : 5 risques priorisés, 3 horizons d'action."</li>
+        <li>"P1 c'est l'urgence à 6 semaines : règle 3-2-1, MFA admin, cluster HA."</li>
+        <li>"RGPD : notification CNIL sous 72h. On l'a explicitement documenté."</li>
       </ul>
-      <p class="transition">→ Transition : "La supervision détecte les incidents avant qu'ils deviennent des crises."</p>
     </div>
   </div>
+
+  <div class="block">
+    <div class="block-title">Supervision — Prometheus + Grafana · 5 indicateurs</div>
+    <div class="tw"><table>
+      <thead><tr><th>Indicateur</th><th>Normal</th><th>Alerte</th><th>Critique</th></tr></thead>
+      <tbody>
+        <tr><td>Latence SQL</td><td>&lt; 50 ms</td><td>&gt; 150 ms</td><td>&gt; 300 ms</td></tr>
+        <tr><td>Connexions actives</td><td>&lt; 50</td><td>&gt; 100</td><td>&gt; 150</td></tr>
+        <tr><td>Réplication (retard)</td><td>0–5 s</td><td>&gt; 15 s</td><td><strong>&gt; 30 s ⚠ RPO</strong></td></tr>
+        <tr><td>Espace disque libre</td><td>&gt; 20 %</td><td>&lt; 15 %</td><td><strong>&lt; 10 % ⚠ arrêt</strong></td></tr>
+        <tr><td>Succès sauvegardes</td><td>100 %</td><td>1 échec</td><td>&gt; 1 échec</td></tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:0.82rem;margin-top:0.4rem;">Lier aux objectifs : retard réplication &gt;30s → <strong>RPO 15min menacé</strong> · disque &lt;10% → <strong>arrêt MariaDB possible</strong></p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Exploitation — RunBook & Logs</div>
+    <p><strong>RunBook :</strong> Start/Stop, health checks, checklists quotidienne/hebdo, matrice escalade N1(15min) → N4 DBA(2h), KPI.</p>
+    <p style="margin-top:0.4rem;"><strong>5 sources de logs :</strong> <code>error.log</code> (InnoDB) · <code>slow.log</code> (perf) · binlogs (PITR) · HAProxy (Backend DOWN) · sauvegardes (Backup failed)</p>
+  </div>
+
 </div>
 
-<!-- ══ 6. EXPLOITATION ══ -->
-<div class="section" id="s6">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">6 · Exploitation — RunBook &amp; Logs</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="orateurs"><span class="orateur">Zaid</span></div>
+<!-- ══════════════════════════════════════════════
+     TAB 5 — PIVOT & CHOIX TECHNIQUES
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-pivot">
 
-    <p><strong>RunBook :</strong> Start/Stop, health checks, checklists quotidienne/hebdo, gestion incidents, <strong>matrice d'escalade N1→N4</strong> (15 min → 2 h), KPI.</p>
-
-    <h3>5 sources de logs</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Source</th><th>Patterns critiques</th></tr></thead>
-        <tbody>
-          <tr><td><code>error.log</code></td><td>InnoDB corruption</td></tr>
-          <tr><td><code>slow.log</code></td><td>Requêtes lentes</td></tr>
-          <tr><td>Binlogs</td><td>PITR, réplication</td></tr>
-          <tr><td>HAProxy</td><td>Backend DOWN</td></tr>
-          <tr><td>Sauvegardes</td><td>Backup failed</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="margin-top:0.5rem; font-size:0.84rem; color:var(--muted); font-family:-apple-system,sans-serif;">Chaque pattern cartographié avec gravité + action → <code>Slave_IO=No</code>, <code>Too many connections</code>, etc.</p>
-  </div>
-</div>
-
-<!-- ══ 7. PIÈGE N°1 ══ -->
-<div class="section" id="s7">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">7 · Piège n°1 <span class="tag tag-red">ATTENDU</span></div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="callout callout-red">
-      <div class="callout-title">Question jury</div>
-      « Le sujet demande la séparation des données par client, je ne la vois pas comme une isolation forte dans votre schéma. »
-    </div>
-
-    <div class="callout callout-green">
-      <div class="callout-title">Réponse (à mémoriser)</div>
-      « Sous notre postulat <strong>grossiste</strong> (stock propre NTL), la séparation pertinente est l'<strong>attribution</strong> — présente via <code>mouvement.id_client</code> et la table <code>commande</code> : on sait parfaitement qui a commandé/reçu quoi.<br><br>
-      L'<strong>isolation multi-tenant</strong> (un client ne voit jamais les données d'un autre) ne se justifie qu'en modèle <strong>3PL</strong>, qu'on a explicitement réservé à une V2. C'est un arbitrage <strong>tracé (ADR 0003)</strong>, pas un manque. »
-    </div>
-
-    <p style="font-size:0.84rem; color:var(--muted); font-family:-apple-system,sans-serif;">→ Rester calme. C'est la question attendue.</p>
-  </div>
-</div>
-
-<!-- ══ 8. PIVOT DE CADRAGE ══ -->
-<div class="section" id="s8">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">8 · Pivot de cadrage</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="orateurs"><span class="orateur">Ianis</span></div>
-
-    <h3>Les deux lectures possibles du sujet</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Modèle</th><th>Définition</th><th>Conséquence architecture</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>3PL</strong><br><span style="font-size:0.78rem;color:var(--muted)">Prestataire logistique</span></td>
-            <td>Stocke les marchandises <strong>des clients</strong> (ex. Amazon FBA)</td>
-            <td>Isolation multi-tenant obligatoire : FK composite <code>(id_article, id_client)</code>, cloisonnement par tenant</td>
-          </tr>
-          <tr>
-            <td><strong>Grossiste ★</strong><br><span style="font-size:0.78rem;color:var(--green)">Postulat retenu</span></td>
-            <td>Achète et stocke <strong>ses propres marchandises</strong>, revend à des clients</td>
-            <td>Attribution suffit : <code>mouvement.id_client</code> + table <code>commande</code> — on sait qui reçoit quoi</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout callout-green">
+  <div class="block">
+    <div class="block-title">Postulat de cadrage — les deux lectures du sujet</div>
+    <div class="tw"><table>
+      <thead><tr><th>Modèle</th><th>NTL stocke…</th><th>Séparation nécessaire</th><th>Choix</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>3PL</strong></td>
+          <td>Marchandises <strong>des clients</strong></td>
+          <td>Isolation forte — FK composite (id_article, id_client)</td>
+          <td><span class="tag t-red">Écarté</span></td>
+        </tr>
+        <tr>
+          <td><strong>Grossiste</strong></td>
+          <td>Ses <strong>propres</strong> marchandises</td>
+          <td>Attribution suffit — mouvement.id_client + commande</td>
+          <td><span class="tag t-green">Retenu ★</span></td>
+        </tr>
+      </tbody>
+    </table></div>
+    <div class="callout c-green">
       <strong>Comment cadrer l'exploration initiale du 3PL :</strong><br>
-      « En début de projet, on a analysé les deux modèles architecturalement — c'est en creusant le modèle 3PL qu'on a réalisé que les contraintes (FK composites, isolation tenant) n'étaient pas justifiées par la description de NTL. On a alors posé le postulat grossiste, tracé la décision en ADR 0003, et aligné toute l'architecture dessus. C'est une itération maîtrisée, pas du tâtonnement. »
+      « En début de projet on a analysé les deux modèles. C'est en creusant le 3PL qu'on a conclu qu'il ne correspondait pas à NTL. On a posé le postulat grossiste, tracé la décision en ADR 0003, et aligné toute l'architecture dessus. Itération maîtrisée, pas du tâtonnement. »
+    </div>
+    <div class="block" style="margin-top:0.7rem;border:none;padding:0;">
+      <p><strong>Conséquences du pivot :</strong> D02/D03/D04 SUPERSEDED par D13 → 0 trigger · 0 FK composite · 8 tables (suppression article_stock, ajout commande)</p>
+    </div>
+    <div class="adire">
+      <div class="adire-title">À l'oral</div>
+      <ul>
+        <li>"Le brief pouvait se lire de deux façons — grossiste ou 3PL. C'est une vraie question d'architecture."</li>
+        <li>"On a analysé les deux, on a conclu que NTL est un grossiste. Le postulat est tracé dans l'ADR 0003."</li>
+        <li>Si on reproche les décisions retirées : <em>"C'était une itération maîtrisée — les décisions D02-D04 existaient dans le contexte 3PL. Une fois le postulat posé, elles sont devenues caduques et on les a SUPERSEDED proprement."</em></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Choix techniques — justifications</div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi MariaDB et pas MySQL ? <span class="chev">▼</span></div>
+      <div class="qa-a"><strong>Argument n°1 :</strong> drop-in replacement MySQL → migration nulle, équipe IT pas reformée. LTS 2029, indépendance Oracle, Galera natif.<br>⚠ Ne JAMAIS dire "MariaDB est mieux". Dire : <strong>"meilleur compromis dans CE contexte"</strong>.</div>
     </div>
 
-    <p><strong>Problème :</strong> sujet ambigu → « PME logistique » + « séparation par client » se lit grossiste <em>ou</em> 3PL.</p>
-    <p><strong>Solution :</strong> postulat explicite <strong>grossiste</strong> (ADR 0003, 22/05). Démarche d'<strong>itération maîtrisée</strong>, pas du tâtonnement.</p>
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi pas PostgreSQL ? <span class="chev">▼</span></div>
+      <div class="qa-a">Postgres impose de réécrire le WMS-APP (driver, dialecte, types) — hors sujet. L'équipe IT NTL n'a aucune compétence Postgres. Mauvais compromis dans ce contexte spécifique.</div>
+    </div>
 
-    <h3>Conséquences de ce pivot</h3>
-    <p>Décisions D02/D03/D04 → <strong>SUPERSEDED</strong> par D13 :</p>
-    <ul style="margin:0.5rem 0 0.5rem 1.2rem; font-size:0.88rem; line-height:1.9;">
-      <li>Multi-tenant (FK composite) <strong>retiré</strong> → reporté V2 si bascule 3PL</li>
-      <li>Triggers <strong>supprimés</strong> → <strong>0 trigger</strong></li>
-      <li>FOURNISSEUR <strong>dé-entifié</strong> (attribut texte) + table <code>commande</code> ajoutée → <strong>8 tables</strong></li>
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi réplication asynchrone et pas Galera synchrone ? <span class="chev">▼</span></div>
+      <div class="qa-a">Faible impact master + <strong>simplicité</strong> (équipe IT réduite, pas de spécialiste cluster). Galera synchrone = évolution V2 si les besoins RPO évoluent. Arbitrage assumé.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pourquoi 3NF et pas BCNF ou 4NF ? <span class="chev">▼</span></div>
+      <div class="qa-a">3NF suffisante : toutes les DFE sont portées par la PK auto-incrémentée, pas de dépendance transitive résiduelle. BCNF/4NF = sur-normalisation sans gain d'intégrité dans ce modèle.</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Périmètre V1 / Perspectives V2</div>
+    <div class="callout c-blue">Cadrer la V1 comme un <strong>MVP</strong>, pas un "brouillon". Tout ce qui est hors V1 est <strong>arbitrage tracé</strong>.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Hors V1</th><th>Pourquoi</th><th>V2</th></tr></thead>
+      <tbody>
+        <tr><td>Multi-tenant (isolation)</td><td>Postulat grossiste</td><td>FK composite si pivot 3PL</td></tr>
+        <tr><td>Lots / DLC / FEFO</td><td>Cœur WMS d'abord</td><td>Entité LOT + date_expiration</td></tr>
+        <tr><td><strong>Exécution du DDL</strong></td><td>Manque de temps</td><td><strong>1re priorité V2</strong></td></tr>
+        <tr><td>Galera / HAProxy cluster</td><td>Complexité opérationnelle</td><td>V2 si besoin RPO évolue</td></tr>
+        <tr><td>Gestion fournisseurs</td><td>Portée par l'ERP</td><td>V2 si intégration</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 6 — ENTRETIEN & PIÈGES
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-entretien">
+
+  <div class="block">
+    <div class="block-title">Piège n°1 — question attendue <span class="tag t-red">ATTENDU</span></div>
+    <div class="callout c-red">
+      <strong>Jury :</strong> « Le sujet demande la séparation des données par client, je ne la vois pas comme une isolation forte dans votre schéma. »
+    </div>
+    <div class="callout c-green">
+      <strong>Réponse :</strong> « Sous notre postulat grossiste (stock propre NTL), la séparation pertinente est l'<strong>attribution</strong> — présente via <code>mouvement.id_client</code> et la table <code>commande</code>. L'isolation multi-tenant ne se justifie qu'en modèle 3PL, réservé à V2. C'est un arbitrage tracé (ADR 0003), pas un manque. »
+    </div>
+    <p style="font-size:0.84rem;color:var(--muted);">Rester calme. C'est LA question attendue.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Questions pièges supplémentaires</div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Votre modèle gère-t-il le FEFO / FIFO ? <span class="chev">▼</span></div>
+      <div class="qa-a"><strong>Non, explicitement hors V1.</strong> Stock agrégé par emplacement, pas de lot ni date de péremption. V2 : entité LOT avec date_expiration + FK stock → lot.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Comment scalez-vous si NTL passe à 10 entrepôts ? <span class="chev">▼</span></div>
+      <div class="qa-a">Schéma : SITE + LOCALISATION supportent N sites sans modification. DB : scalabilité verticale couvre la croissance. Horizontal : Galera ou read replicas en V2.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Votre audit log "inviolable" — comment concrètement ? <span class="chev">▼</span></div>
+      <div class="qa-a">V1 : MariaDB Audit Plugin → fichier sur disque séparé, droits DBA sans modification possible. NAS en append-only. V2 : WORM storage (Write Once Read Many). Rétention 12 mois.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Vos sauvegardes — comment vous testez que ça marche vraiment ? <span class="chev">▼</span></div>
+      <div class="qa-a">Restauration complète mensuelle sur environnement isolé (checksum + comptage tables). Bascule HA trimestrielle. Bascule PRA semestrielle. Les sauvegardes non testées ne sont pas des sauvegardes — c'est dans le runbook.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pas de chiffrement au repos — pourquoi ? <span class="chev">▼</span></div>
+      <div class="qa-a">Non implémenté V1, assumé et tracé. MariaDB supporte <code>innodb_encrypt_tables=ON</code>. En V1 on a priorisé disponibilité et intégrité. Chiffrement = P3 du plan sécurité (6 mois). TLS en V2.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Qu'est-ce qui différencie votre travail d'un schéma SQL téléchargé ? <span class="chev">▼</span></div>
+      <div class="qa-a">« Un schéma SQL seul ne se met pas en production. On a livré un <strong>système exploitable dès J+1</strong> : runbook, escalade N1→N4, supervision avec seuils, note CODIR, 6 ADR. Et on a résolu une vraie ambiguïté métier par démarche structurée. »</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="tq(this)">Pas de gestion authentification / sessions utilisateurs WMS ? <span class="chev">▼</span></div>
+      <div class="qa-a">La table UTILISATEUR trace <strong>qui fait quoi</strong> (traçabilité métier). L'authentification applicative (login, session, JWT) est portée par WMS-APP, hors périmètre BDD V1. Séparation volontaire : BDD = traçabilité, appli = identité.</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Réflexes entretien 30 min</div>
+    <div class="callout c-green"><strong>Honnêteté > bluff</strong> : DDL non exécuté, BIA non chiffrée, impacts qualitatifs → tout est <strong>assumé et tracé</strong>.</div>
+    <ul style="margin-top:0.6rem;">
+      <li>Toute limite = <strong>arbitrage tracé</strong> (renvoyer à l'ADR), jamais un oubli.</li>
+      <li>« On n'a pas compris le sujet » → interdit. Dire : « on a tranché une ambiguïté par un postulat assumé ».</li>
+      <li>Rester calme sur le piège isolation/multi-tenant — c'est LA question attendue.</li>
     </ul>
-
-    <div class="callout callout-blue">
-      À raconter comme une <strong>démonstration de maturité</strong> : on a détecté l'ambiguïté, posé un postulat, tracé la décision, livré un MVP cohérent.
-    </div>
-    <div class="a-dire">
-      <div class="a-dire-title">À dire à l'oral — slide pivot de cadrage</div>
-      <ul>
-        <li><strong>Mise en contexte</strong> — "Dès le début, le brief pouvait se lire de deux façons — un grossiste ou un prestataire 3PL. C'est une vraie question d'architecture, pas une imprécision du sujet."</li>
-        <li><strong>Le 3PL</strong> — "En 3PL, NTL stockerait les marchandises de ses clients : ça exige une isolation forte par tenant, des FK composites, une séparation des données que le jury peut d'ailleurs nous demander."</li>
-        <li><strong>Notre choix</strong> — "On a analysé les deux, on a conclu que NTL est un grossiste — elle achète, stocke et revend. Le postulat est tracé dans l'ADR 0003."</li>
-        <li><strong>Si on nous reproche les décisions retirées</strong> — <span class="secours">"C'était une itération maîtrisée : les décisions D02-D04 existaient dans le contexte 3PL. Une fois le postulat grossiste posé, elles sont devenues caduques et on les a SUPERSEDED proprement."</span></li>
-      </ul>
-      <p class="transition">→ Transition : "Ce postulat explique tous nos choix techniques — voyons-les."</p>
+    <div class="callout c-blue" style="margin-top:0.6rem;">
+      <strong>Format :</strong> 20 min oral collectif + 30 min entretien jury (2 évaluateurs — questions individuelles possibles)
     </div>
   </div>
+
 </div>
-
-<!-- ══ 9. CHOIX TECHNIQUES ══ -->
-<div class="section" id="s9">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">9 · Choix techniques</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi MariaDB et pas MySQL ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        <strong>Argument n°1 :</strong> drop-in replacement de MySQL → migration quasi nulle, équipe IT pas reformée.<br><br>
-        En plus : LTS jusqu'en 2029, indépendance Oracle (Fondation MariaDB), Galera natif pour une évolution HA synchrone.<br><br>
-        <span style="color:var(--red)">Ne PAS dire « MariaDB est mieux ».</span> Dire : « <strong>meilleur compromis dans CE contexte</strong> ».
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi pas PostgreSQL ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Postgres imposerait de <strong>réécrire le WMS-APP</strong> (driver, dialecte, types) — hors sujet.<br>
-        L'équipe IT NTL n'a aucune compétence Postgres.<br>
-        → Mauvais compromis dans ce contexte spécifique, même si Postgres est excellent par ailleurs.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi réplication asynchrone et pas synchrone (Galera) ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Faible impact master + <strong>simplicité</strong> (équipe IT réduite, pas de spécialiste cluster).<br>
-        Galera synchrone = évolution V2 si les besoins RPO évoluent. C'est un arbitrage assumé.
-      </div>
-    </div>
-    <div class="a-dire">
-      <div class="a-dire-title">À dire à l'oral — slide choix techniques</div>
-      <ul>
-        <li><strong>Le mot interdit</strong> — Ne JAMAIS dire "MariaDB est mieux". Toujours : "meilleur compromis dans CE contexte spécifique."</li>
-        <li><strong>Argument n°1</strong> — "Drop-in replacement MySQL. L'équipe IT de NTL n'a rien à réapprendre, le WMS-APP continue de fonctionner sans modification."</li>
-        <li><strong>Async vs Galera</strong> — "La réplication asynchrone, c'est la simplicité d'exploitation. Galera synchrone, c'est plus robuste mais ça demande un spécialiste cluster. En V1 avec une équipe IT réduite, on fait le bon choix."</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 10. V1 / V2 ══ -->
-<div class="section" id="s10">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">10 · Périmètre V1 / Perspectives V2</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="callout callout-blue">
-      Cadrer la V1 comme un <strong>MVP</strong>, pas un « brouillon ». Tout ce qui est hors V1 est <strong>assumé et tracé</strong>.
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Hors V1</th><th>Pourquoi</th><th>V2</th></tr></thead>
-        <tbody>
-          <tr><td>Multi-tenant (isolation)</td><td>Postulat grossiste</td><td>FK composite si bascule 3PL</td></tr>
-          <tr><td>Lots / DLC / FEFO</td><td>Cœur WMS d'abord</td><td>V2</td></tr>
-          <tr><td>Expéditions / transporteurs</td><td>Hors cœur entreposage</td><td>V2</td></tr>
-          <tr><td>Gestion fournisseurs</td><td>Portée par l'ERP commercial</td><td>V2 si intégration</td></tr>
-          <tr><td>Prix / facturation</td><td>Hors périmètre BDD WMS</td><td>ERP</td></tr>
-          <tr><td><strong>Exécution du DDL</strong></td><td>Manque de temps</td><td><strong>1ère perspective</strong></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 10b. QUESTIONS PIÈGES — JURY DIFFICILE ══ -->
-<div class="section" id="s10b">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">10b · Questions pièges — jury difficile <span class="tag tag-red">À PRÉPARER</span></div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi pas BCNF ou 4NF ? Votre 3NF est-elle vraiment suffisante ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        3NF est suffisante pour ce modèle. Toutes les dépendances fonctionnelles sont portées par la PK auto-incrémentée — pas de dépendance transitive résiduelle.<br>
-        BCNF = cas où une DFE n'est pas portée par une super-clé candidate. Ici, toutes les DFE convergent vers la PK.<br>
-        4NF = dépendances multivaluées. Pas de cas dans notre schéma (pas de relation N-N "cachée").<br>
-        <strong>Aller au-delà = sur-normalisation</strong> qui dégraderait les performances sans gain d'intégrité.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Votre modèle gère-t-il le FEFO / FIFO ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        <strong>Non — explicitement hors V1.</strong><br>
-        Modèle V1 : le stock agrège les quantités par emplacement, sans notion de lot ni de date de péremption.<br>
-        Pour FEFO (First Expired, First Out) : il faudrait une entité <code>LOT</code> avec <code>date_expiration</code> et une FK <code>stock → lot</code>.<br>
-        C'est tracé dans les perspectives V2. En soutenance : "NTL V1 est un grossiste sans gestion de péremption — c'est une simplification délibérée du MVP."
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Comment scalez-vous si NTL passe de 3 à 10 entrepôts ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        <strong>Schéma</strong> : l'entité SITE + LOCALISATION supporte N sites sans modification — on ajoute juste des lignes.<br>
-        <strong>DB</strong> : un master supporte largement 10 entrepôts en charge transactionnelle WMS. La scalabilité verticale (plus de RAM/CPU) couvre la croissance à court terme.<br>
-        <strong>Architecture</strong> : si besoin horizontal → Galera Cluster (V2) ou read replicas supplémentaires pour les lectures de reporting.<br>
-        La scalabilité <strong>schéma</strong> est native. La scalabilité <strong>infra</strong> est en V2.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Votre audit log "inviolable" — comment vous l'implémentez concrètement ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        V1 (plan P2) : <strong>MariaDB Audit Plugin</strong> → écriture dans un fichier dédié sur disque séparé. Compte DBA sans accès en modification sur ce fichier.<br>
-        Externalisation : envoi des logs vers le NAS avec droits en <strong>écriture seule</strong> (append-only). Impossible de modifier un log déjà écrit.<br>
-        V2 : <strong>WORM storage</strong> (Write Once, Read Many) sur NAS ou cloud — garantie physique d'inviolabilité.<br>
-        Rétention 12 mois : exigence de traçabilité réglementaire (art. 30 RGPD + interne NTL).
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Qu'est-ce qui différencie votre travail d'un simple schéma SQL téléchargé sur internet ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Réponse directe et assurée :<br>
-        « Un schéma SQL seul ne se met pas en production. On a livré un <strong>système exploitable dès J+1</strong> : runbook de démarrage et d'incident, procédures d'escalade N1→N4, plan de supervision avec seuils calibrés, note de direction CODIR avec plan d'action priorisé, 6 ADR tracés qui documentent chaque décision non-évidente. »<br><br>
-        « De plus, on a fait face à une vraie ambiguïté métier — grossiste ou 3PL — qu'on a résolue par démarche structurée plutôt que de choisir au hasard. C'est ça, de l'ingénierie. »
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Vous n'avez pas de gestion des utilisateurs WMS (authentification, sessions, droits applicatifs) ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        La table <code>UTILISATEUR</code> dans le schéma trace <strong>qui fait quoi</strong> dans le WMS (opérateurs, gestionnaires de compte client).<br>
-        L'<strong>authentification applicative</strong> (login, session, token JWT) est portée par la couche WMS-APP, hors périmètre BDD V1.<br>
-        Les <strong>droits MariaDB</strong> sont définis : appuser (DML), replicator, dba (DDL+SSH+MFA), backup.<br>
-        La séparation est volontaire : la BDD gère la traçabilité métier, l'applicatif gère l'identité.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Vos sauvegardes — comment vous testez que la restauration fonctionne vraiment ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Plan de tests défini (section PRA) :<br>
-        • Restauration complète <strong>mensuelle</strong> sur environnement isolé → vérification checksum + comptage tables<br>
-        • Bascule HA <strong>trimestrielle</strong> → promotion BDD2, vérification applicatif, retour BDD1<br>
-        • Bascule PRA <strong>semestrielle</strong> → test BDD3, RTO effectif mesuré<br>
-        Les sauvegardes non testées ne sont pas des sauvegardes — on l'a explicitement documenté dans le runbook.
-      </div>
-    </div>
-
-    <div class="qa">
-      <div class="qa-q" onclick="toggleQA(this)">Pourquoi pas de chiffrement des données au repos (encryption at rest) ? <span class="qa-chevron">▼</span></div>
-      <div class="qa-a">
-        Non implémenté en V1 — assumé et tracé.<br>
-        MariaDB supporte le chiffrement InnoDB natif (<code>innodb_encrypt_tables=ON</code>) via le plugin de gestion de clés.<br>
-        En V1, on s'est concentré sur la disponibilité et l'intégrité. Le chiffrement au repos = P3 du plan de sécurité (6 mois).<br>
-        La <strong>transmission</strong> (WMS-APP → HAProxy → BDD) peut être chiffrée via TLS/SSL MariaDB — hors V1, documenté en perspectives V2.
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ══ 11. RÉPARTITION ORATEURS ══ -->
-<div class="section" id="s11">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">11 · Répartition orateurs</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Slides</th><th>Sujet</th><th>Orateur(s)</th></tr></thead>
-        <tbody>
-          <tr><td>1–3</td><td>Titre, contexte, démarche</td><td><span class="tag tag-blue">Ianis</span></td></tr>
-          <tr><td>4–6</td><td>Modèle de données (MCD, choix, intégrité)</td><td><span class="tag tag-blue">Ianis</span> <span class="tag tag-purple">Blaise</span></td></tr>
-          <tr><td>7–8</td><td>Architecture HA / PRA</td><td><span class="tag tag-green">Ojvind</span> <span class="tag tag-orange">Zaid</span></td></tr>
-          <tr><td>9</td><td>Sécurité (note CODIR)</td><td><span class="tag tag-orange">Zaid</span></td></tr>
-          <tr><td>10</td><td>Supervision</td><td><span class="tag tag-green">Ojvind</span></td></tr>
-          <tr><td>11</td><td>RunBook &amp; logs</td><td><span class="tag tag-orange">Zaid</span></td></tr>
-          <tr><td>12</td><td>Pivot de cadrage (difficulté)</td><td><span class="tag tag-blue">Ianis</span></td></tr>
-          <tr><td>13</td><td>Résultats &amp; perspectives</td><td><span class="tag tag-purple">Blaise</span></td></tr>
-          <tr><td>14</td><td>Conclusion + questions</td><td><em style="color:var(--muted)">équipe</em></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 12. RÉFLEXES ENTRETIEN ══ -->
-<div class="section" id="s12">
-  <div class="section-header" onclick="toggleSection(this)">
-    <div class="section-title">12 · Réflexes — entretien 30 min</div>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="section-body">
-    <div class="callout callout-green">
-      <strong>Honnêteté &gt; bluff</strong> : DDL non exécuté, BIA non chiffrée, impacts qualitatifs → tout est <strong>assumé et tracé</strong>.
-    </div>
-
-    <p>• Toute limite = <strong>arbitrage tracé</strong> (renvoyer à l'ADR), jamais un oubli.</p>
-    <p>• « On n'a pas compris le sujet » → interdit. Dire « on a tranché une ambiguïté par un postulat assumé ».</p>
-    <p>• Rester calme sur le piège isolation/multi-tenant (<a href="#s7" style="color:var(--navy)">§7</a>) — c'est LA question attendue.</p>
-
-    <div class="callout callout-orange">
-      <div class="callout-title">Format 20 + 30</div>
-      <strong>20 min</strong> : oral collectif (présentation)<br>
-      <strong>30 min</strong> : entretien jury (2 évaluateurs) — questions individuelles possibles
-    </div>
-  </div>
-</div>
-
-</main>
-
-<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
-  function toggleSection(header) {
-    header.parentElement.classList.toggle('open');
+  function showTab(id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.scrollTo(0, 0);
   }
 
-  function toggleQA(qEl) {
-    qEl.parentElement.classList.toggle('open');
+  function tq(el) {
+    el.parentElement.classList.toggle('open');
   }
-
-  function toggleNav() {
-    document.getElementById('nav-menu').classList.toggle('open');
-  }
-
-  function closeNav() {
-    document.getElementById('nav-menu').classList.remove('open');
-  }
-
-  window.addEventListener('scroll', () => {
-    const btn = document.getElementById('top-btn');
-    btn.classList.toggle('visible', window.scrollY > 300);
-  });
-
-  document.addEventListener('click', (e) => {
-    const nav = document.getElementById('nav-menu');
-    const toggle = document.getElementById('nav-toggle');
-    if (!nav.contains(e.target) && e.target !== toggle) {
-      nav.classList.remove('open');
-    }
-  });
 </script>
 </body>
 </html>
