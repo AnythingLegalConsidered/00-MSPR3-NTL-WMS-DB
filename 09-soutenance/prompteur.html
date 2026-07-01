@@ -8,27 +8,27 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0d1117;
-    color: #e6edf3;
+    background: #f6f8fa;
+    color: #1f2328;
     height: 100vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
   }
   header {
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
+    background: #ffffff;
+    border-bottom: 1px solid #d1d9e0;
     padding: 12px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
   }
-  header h1 { font-size: 16px; font-weight: 600; color: #58a6ff; }
-  .meta { font-size: 13px; color: #8b949e; }
+  header h1 { font-size: 16px; font-weight: 600; color: #0969da; }
+  .meta { font-size: 13px; color: #59636e; }
   .meta span { margin-left: 16px; }
-  .meta .orateur { color: #f0883e; font-weight: 600; }
-  .meta .time { color: #3fb950; }
+  .meta .orateur { color: #bc4c00; font-weight: 600; }
+  .meta .time { color: #1a7f37; }
   main {
     flex: 1;
     overflow-y: auto;
@@ -40,29 +40,29 @@
     margin: 0 auto 60px;
     padding: 32px;
     border-radius: 12px;
-    border: 1px solid #30363d;
-    background: #161b22;
+    border: 1px solid #d1d9e0;
+    background: #ffffff;
     transition: border-color 0.2s;
   }
-  .slide.active { border-color: #58a6ff; box-shadow: 0 0 20px rgba(88,166,255,0.15); }
+  .slide.active { border-color: #0969da; box-shadow: 0 0 20px rgba(9,105,218,0.12); }
   .slide-header {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 20px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #21262d;
+    border-bottom: 1px solid #d1d9e0;
   }
   .slide-num {
-    background: #58a6ff;
-    color: #0d1117;
+    background: #0969da;
+    color: #ffffff;
     font-weight: 700;
     font-size: 14px;
     padding: 4px 10px;
     border-radius: 6px;
   }
-  .slide-title { font-size: 20px; font-weight: 600; }
-  .slide-info { font-size: 13px; color: #8b949e; margin-left: auto; }
+  .slide-title { font-size: 20px; font-weight: 600; color: #1f2328; }
+  .slide-info { font-size: 13px; color: #59636e; margin-left: auto; }
   .section { margin-bottom: 20px; }
   .section-label {
     font-size: 12px;
@@ -71,31 +71,31 @@
     letter-spacing: 1px;
     margin-bottom: 8px;
   }
-  .section-label.ecran { color: #d2a8ff; }
-  .section-label.dire { color: #3fb950; }
-  .section-label.piège { color: #f85149; }
-  .ecran-text { color: #d2a8ff; font-size: 15px; font-style: italic; }
+  .section-label.ecran { color: #8250df; }
+  .section-label.dire { color: #1a7f37; }
+  .section-label.piège { color: #cf222e; }
+  .ecran-text { color: #8250df; font-size: 15px; font-style: italic; }
   .dire-text {
-    color: #e6edf3;
+    color: #1f2328;
     font-size: 18px;
     line-height: 1.7;
     padding: 16px 20px;
-    background: #0d1117;
+    background: #f6f8fa;
     border-radius: 8px;
-    border-left: 3px solid #3fb950;
+    border-left: 3px solid #1a7f37;
   }
   .piege-text {
-    color: #ffa198;
+    color: #82071e;
     font-size: 15px;
     line-height: 1.6;
     padding: 12px 16px;
-    background: rgba(248,81,73,0.08);
+    background: rgba(207,34,30,0.06);
     border-radius: 8px;
-    border-left: 3px solid #f85149;
+    border-left: 3px solid #cf222e;
   }
   footer {
-    background: #161b22;
-    border-top: 1px solid #30363d;
+    background: #ffffff;
+    border-top: 1px solid #d1d9e0;
     padding: 10px 24px;
     display: flex;
     justify-content: center;
@@ -104,9 +104,9 @@
     flex-shrink: 0;
   }
   .nav-btn {
-    background: #21262d;
-    border: 1px solid #30363d;
-    color: #e6edf3;
+    background: #f6f8fa;
+    border: 1px solid #d1d9e0;
+    color: #1f2328;
     padding: 8px 20px;
     border-radius: 6px;
     cursor: pointer;
@@ -114,26 +114,26 @@
     font-weight: 500;
     transition: all 0.15s;
   }
-  .nav-btn:hover { background: #30363d; border-color: #58a6ff; }
+  .nav-btn:hover { background: #eaeef2; border-color: #0969da; }
   .nav-btn:disabled { opacity: 0.3; cursor: default; }
   .progress {
     font-size: 13px;
-    color: #8b949e;
+    color: #59636e;
     min-width: 80px;
     text-align: center;
   }
   .timer {
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 14px;
-    color: #3fb950;
-    background: #0d1117;
+    color: #1a7f37;
+    background: #f6f8fa;
     padding: 6px 12px;
     border-radius: 6px;
-    border: 1px solid #30363d;
+    border: 1px solid #d1d9e0;
   }
   .help {
     font-size: 11px;
-    color: #484f58;
+    color: #848d97;
   }
   @media (max-width: 768px) {
     main { padding: 20px; }
