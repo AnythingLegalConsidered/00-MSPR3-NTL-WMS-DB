@@ -10,14 +10,14 @@
 | # | Slide | Orateur | Cible |
 |---|---|---|---|
 | 1 | Titre | Ianis | 0:30 |
-| 2 | Contexte & enjeu | Ianis | 1:30 |
-| 3 | Démarche & pilotage | Ianis | 1:30 |
-| 4 | Modèle de données | Blaise (+ Ianis) | 2:00 |
-| 5 | Optimisation | Blaise | 1:00 |
-| 6 | Choix SGBD | Ojvind | 1:00 |
+| 2 | Contexte & enjeu | Blaise | 1:30 |
+| 3 | Démarche & pilotage | Blaise | 1:30 |
+| 4 | Modèle de données | Blaise | 2:00 |
+| 5 | Optimisation | Ianis | 1:00 |
+| 6 | Choix SGBD | Ianis | 1:00 |
 | 7 | Architecture HA | Ojvind | 1:30 |
-| 8 | PRA & sauvegardes | Zaid | 2:00 |
-| 9 | Sécurité des accès | Zaid | 1:00 |
+| 8 | PRA & sauvegardes | Ojvind | 2:00 |
+| 9 | Sécurité des accès | Ojvind | 1:00 |
 | 10 | Note CODIR | Zaid | 1:30 |
 | 11 | Supervision | Ojvind | 1:30 |
 | 12 | RunBook & logs | Zaid | 1:30 |
@@ -34,12 +34,12 @@
 
 🖥️ Titre du projet, l'équipe, un résumé en anglais.
 
-🎤 « Bonjour. Nous sommes Ianis, Blaise, Ojvind et Zaid, et nous allons vous présenter notre travail sur l'industrialisation de la base de données du WMS de NordTransit Logistics — le système qui pilote leurs entrepôts. Je vais commencer par poser le contexte et notre démarche, puis mes collègues dérouleront la conception du modèle, l'architecture, la sécurité et l'exploitation. On terminera par les difficultés qu'on a rencontrées et nos perspectives. »
+🎤 « Bonjour. Nous sommes Ianis, Blaise, Ojvind et Zaid, et nous allons vous présenter notre travail sur l'industrialisation de la base de données du WMS de NordTransit Logistics — le système qui pilote leurs entrepôts. Je vais poser le contexte général, puis Blaise prendra le relais pour le contexte métier et le modèle de données. Ensuite, Ianis reviendra sur l'optimisation et le choix du SGBD, Ojvind déroulera l'architecture et la sécurité, Zaid présentera la note CODIR et les logs, et on terminera ensemble avec les difficultés et les perspectives. »
 
 ---
 
 ## Slide 2 — Contexte & enjeu
-**Ianis · 1:30**
+**Blaise · 1:30**
 
 🖥️ NTL en bref, criticité du WMS, contraintes, existant fragile.
 
@@ -50,11 +50,11 @@
 ---
 
 ## Slide 3 — Démarche & pilotage projet
-**Ianis · 1:30**
+**Blaise · 1:30**
 
 🖥️ Équipe et rôles, méthode, décisions tracées, registre des risques.
 
-🎤 « Nous étions quatre, sur un budget de dix-neuf heures. Deux sur le modèle de données — Blaise et moi — et deux sur l'infrastructure et l'exploitation — Ojvind et Zaid. On a travaillé en quatre temps : cadrage, conception, industrialisation, puis documentation. Chaque décision structurante a été tracée dans un journal de décisions : on en a six, là où le sujet en demande au moins trois. On tient aussi un registre de neuf risques, avec impacts et mesures. Et dès le cadrage, on a heurté une ambiguïté de fond dans le sujet — j'y reviens à la fin, parce que c'est elle qui a structuré tout le reste de notre travail. »
+🎤 « Nous étions quatre, sur un budget de dix-neuf heures. Deux sur le modèle de données — Ianis et moi — et deux sur l'infrastructure et l'exploitation — Ojvind et Zaid. On a travaillé en quatre temps : cadrage, conception, industrialisation, puis documentation. Chaque décision structurante a été tracée dans un journal de décisions : on en a six, là où le sujet en demande au moins trois. On tient aussi un registre de neuf risques, avec impacts et mesures. Et dès le cadrage, on a heurté une ambiguïté de fond dans le sujet — Ianis y reviendra à la fin, parce que c'est elle qui a structuré tout le reste de notre travail. »
 
 ---
 
@@ -72,7 +72,7 @@
 ---
 
 ## Slide 5 — Optimisation & performance
-**Blaise · 1:00**
+**Ianis · 1:00**
 
 🖥️ Démarche par usages, requêtes types, index, choix physiques.
 
@@ -81,7 +81,7 @@
 ---
 
 ## Slide 6 — Choix du SGBD
-**Ojvind · 1:00**
+**Ianis · 1:00**
 
 🖥️ MariaDB 11.4 LTS, l'argument de continuité, PostgreSQL écarté.
 
@@ -99,7 +99,7 @@
 ---
 
 ## Slide 8 — PRA, sauvegardes & restauration
-**Zaid · 2:00**
+**Ojvind · 2:00**
 
 🖥️ Scénarios de bascule + RTO, RPO via binlogs, scripts de sauvegarde, tests.
 
@@ -110,7 +110,7 @@
 ---
 
 ## Slide 9 — Sécurité des accès
-**Zaid · 1:00**
+**Ojvind · 1:00**
 
 🖥️ Moindre privilège, comptes séparés, MFA, secrets.
 
@@ -194,3 +194,124 @@ Ces cinq slides ne sont **pas** dans les 20 minutes : on les garde en réserve p
 - **Transitions** : chaque orateur termine en annonçant le suivant (« Blaise va vous présenter le modèle… »). À répéter autant que le fond.
 - **Le piège isolation/multi-tenant (slide 13)** : c'est LA question attendue. Rester calme, dérouler attribution vs isolation.
 - **Chrono** : si on déborde, on compresse S5 (optim) et S9 (sécurité accès). On ne sacrifie jamais S13.
+
+---
+
+## 🎯 Questions probables du jury — réponses préparées
+
+### Modèle de données
+
+**Q : « Pourquoi 8 tables et pas plus ? »**
+→ « Le cahier des charges couvrait la gestion d'entrepôt : sites, emplacements, articles, stock, mouvements, clients. Sept entités + une table associative `commande` pour relier clients et articles. Chaque table répond à un besoin métier identifié. Pas de table inutile, pas de manque. »
+
+**Q : « Pourquoi pas de trigger ? »**
+→ « Les triggers rendent le modèle opaque et difficile à déboguer. L'intégrité est portée par le schéma : FK, CHECK, UNIQUE. Les règles métier complexes (ex : mise à jour automatique du stock) sont gérées par l'application, pas par la base. C'est un choix de lisibilité et de maintenabilité. »
+
+**Q : « Pourquoi `stock` est une entité et pas un attribut d'`article` ? »**
+→ « Un article peut être stocké à plusieurs emplacements, avec des quantités différentes. `stock` porte la relation N-N entre `article` et `localisation`, avec la quantité. C'est la seule façon de modéliser correctement : 50 palettes de vis à l'emplacement A et 20 à l'emplacement B = deux lignes `stock` distinctes. »
+
+**Q : « Pourquoi surrogate keys `id_*` au lieu des codes métier ? »**
+→ « Les surrogate keys (entiers auto-incrémentés) sont le standard industriel : FK légères (4 octets), jointures rapides, pas de dépendance aux codes métier qui peuvent changer. Les codes métier (`siret`, `reference`, `code`) restent en UNIQUE NOT NULL pour la traçabilité externe. »
+
+---
+
+### Choix SGBD
+
+**Q : « Pourquoi MariaDB et pas PostgreSQL ? »**
+→ « PostgreSQL est techniquement excellent, mais il aurait fallu réécrire l'application WMS : le pilote, le dialecte SQL, les types. L'équipe IT de NTL ne connaît pas Postgres. MariaDB = drop-in replacement de MySQL, migration quasi nulle, équipe opérationnelle tout de suite. Ce n'est pas "MariaDB est meilleur" — c'est "MariaDB est le meilleur compromis dans CE contexte". »
+
+**Q : « Pourquoi pas MySQL tout court ? »**
+→ « MySQL est désormais contrôlé par Oracle. MariaDB est le fork communautaire, LTS jusqu'en 2029, avec Galera natif pour la réplication synchrone. L'indépendance vis-à-vis d'Oracle est un argument stratégique pour une PME. »
+
+---
+
+### Architecture HA / PRA
+
+**Q : « Pourquoi réplication asynchrone et pas synchrone ? »**
+→ « La réplication synchrone (Galera) garantit zéro perte de données, mais elle ajoute de la latence à chaque écriture — le maître doit attendre l'acquittement des réplicas. Avec une petite équipe IT et un budget limité, l'asynchrone est plus simple à exploiter et pèse moins sur le maître. Le RPO de 15 min est garanti par les binlogs. Galera = évolution V2 si le besoin évolue. »
+
+**Q : « Comment vous assurez que la bascule HA fonctionne vraiment ? »**
+→ « On vérifie trois conditions avant bascule : `Slave_IO_Running=Yes`, `Slave_SQL_Running=Yes`, `Seconds_Behind_Master=0`. On planifie des tests de bascule trimestriels (HA) et semestriels (PRA). Une bascule non testée = une bascule qui échoue le jour J. »
+
+**Q : « Et si le maître plante en plein milieu d'une transaction ? »**
+→ « Les transactions InnoDB sont ACID : si le maître plante avant le commit, la transaction est annulée. Après le commit, elle est dans les binlogs et sera répliquée. Le réplica reprend exactement là où le maître s'est arrêté. Pas de perte, pas de doublon. »
+
+---
+
+### Sécurité
+
+**Q : « Comment vous gérez les mots de passe des comptes applicatifs ? »**
+→ « Les secrets sont dans un coffre (Vaultwarden, Bitwarden, ou équivalent), jamais en clair dans un fichier de config ou un script. L'application les récupère à l'exécution via des variables d'environnement ou un appel API au coffre. Rotation périodique des secrets. »
+
+**Q : « Pourquoi MFA pour les admins et pas pour les applicatifs ? »**
+→ « Les comptes applicatifs sont utilisés par des scripts/automatisations — le MFA bloquerait l'exécution. En revanche, les admins sont des humains qui se connectent en interactive : le MFA (TOTP, clé physique) protège contre le vol de mot de passe. Les comptes applicatifs sont compensés par : moindre privilège, IP whitelist, secrets dans un coffre. »
+
+---
+
+### Pivot grossiste / 3PL (LE piège)
+
+**Q : « Le sujet demande la séparation des données par client, je ne la vois pas comme une isolation forte dans votre schéma. »**
+→ « Sous notre postulat **grossiste** (stock propre NTL), la séparation pertinente est l'**attribution** — présente via `mouvement.id_client` et la table `commande` : on sait parfaitement qui a commandé/reçu quoi. L'**isolation multi-tenant** (un client ne voit jamais les données d'un autre) ne se justifie qu'en modèle **3PL**, qu'on a explicitement **réservé à une V2**. C'est un arbitrage **tracé (ADR 0003)**, pas un manque. »
+
+**Q : « Et si NTL veut faire du 3PL demain ? »**
+→ « Le modèle est prêt pour évoluer : il suffit d'ajouter une FK composite `(id_article, id_client)` sur `stock` et `mouvement`, et de poser des Row-Level Security ou des vues filtrées par client. C'est la V2 qu'on a documentée. Le socle V1 n'empêche pas l'évolution. »
+
+---
+
+### DDL non exécuté
+
+**Q : « Vous n'avez pas testé le DDL ? Comment vous savez qu'il marche ? »**
+→ « On a conçu le DDL avec rigueur : 10 FK, 4 CHECK, des UNIQUE, `ON DELETE RESTRICT`, InnoDB, utf8mb4. Chaque contrainte a été relue et validée. Mais oui, on ne l'a pas encore exécuté sur une instance MariaDB 11.4 — c'est notre première perspective V2. On préfère être honnêtes plutôt que de prétendre l'avoir testé. Le jury valorise l'honnêteté. »
+
+---
+
+### Optimisation
+
+**Q : « Pourquoi des index et pas des vues matérialisées ? »**
+→ « Les vues matérialisées ajoutent de la complexité (rafraîchissement, stockage). Pour les requêtes fréquentes (stock par site, mouvements par période), des index ciblés suffisent et restent simples à maintenir. On optimise là où ça sert, pas partout. »
+
+**Q : « Comment vous savez quelles requêtes sont fréquentes ? »**
+→ « On est partis des cas d'usage métier : un entrepôt consulte le stock d'un article, l'historique des mouvements sur une période, la liste des articles d'un site. Ce sont les patterns standards d'un WMS. En V2, on activerait le Slow Query Log pour valider empiriquement. »
+
+---
+
+### Sauvegardes
+
+**Q : « Pourquoi mariabackup et pas mysqldump ? »**
+→ « `mysqldump` verrouille les tables et est lent sur de grosses bases. `mariabackup` fait une sauvegarde à chaud (non-bloquante), rapide, et restaure en quelques minutes. C'est l'outil recommandé pour MariaDB en production. »
+
+**Q : « Comment vous garantissez le RPO de 15 min ? »**
+→ « Les binlogs capturent chaque transaction en continu. Entre deux sauvegardes complètes (nuit), on archive les binlogs. En cas de crash, on restaure la dernière complète + on rejoue les binlogs jusqu'au point de panne. Perte max = le temps entre deux archives de binlogs, soit < 15 min. »
+
+---
+
+### RGPD / CODIR
+
+**Q : « Vous parlez de RGPD, mais vous n'avez pas chiffré les impacts ? »**
+→ « L'analyse d'impact (BIA) demande des données que NTL seul peut fournir (volume de données clients, flux transfrontaliers). On a posé le cadre : notification sous 72h, droit à l'oubli, minimisation. La BIA chiffrée = perspective V2, à faire avec le DPO de NTL. On ne prétend pas avoir fait le travail du DPO. »
+
+**Q : « Pourquoi une note CODIR et pas un rapport technique ? »**
+→ « Le sujet exigeait un livrable pour la direction. Le CODIR ne lit pas du SQL — il lit des impacts business, des risques chiffrés, des plans d'action. On a traduit la technique en langage métier : arrêt de prod = X k€/jour, ransomware = perte de confiance clients, etc. »
+
+---
+
+### Perspectives V2
+
+**Q : « Quelles sont vos priorités V2 ? »**
+→ « 1) Exécuter le DDL sur une instance MariaDB 11.4 (validation empirique). 2) Multi-tenant si NTL bascule en 3PL (FK composite + RLS). 3) Gestion des lots / DLC / FEFO (cœur WMS). 4) Expéditions / transporteurs (hors V1). 5) Réplication synchrone Galera (zéro perte). Chaque perspective est tracée, pas improvisée. »
+
+**Q : « Pourquoi pas Galera dès la V1 ? »**
+→ « Galera impose une latence supplémentaire à chaque écriture (acquittement synchrone) et nécessite 3 nœuds minimum pour le quorum. Avec une petite équipe et un budget limité, l'asynchrone suffit pour le RPO de 15 min. Galera = évolution V2 si le besoin de zéro perte devient critique. »
+
+---
+
+### Questions pièges
+
+**Q : « Qu'est-ce que vous auriez fait différemment ? »**
+→ « On aurait aimé exécuter le DDL pour valider empiriquement. On aurait aimé chiffrer la BIA avec les données réelles de NTL. Mais avec 19h et 4 personnes, on a livré un socle solide, tracé, industrialisable. Chaque limite = un arbitrage documenté, pas un oubli. »
+
+**Q : « Comment vous gérez les conflits de réplication ? »**
+→ « En asynchrone, les conflits sont rares (un seul maître écrit). Si un conflit arrive (ex : suppression d'une ligne déjà modifiée), le slave s'arrête et notifie. L'admin intervient manuellement. En V2 avec Galera, les conflits sont résolus automatiquement (certification des transactions). »
+
+**Q : « Pourquoi pas de partitionnement des tables ? »**
+→ « Le partitionnement ajoute de la complexité (maintenance, requêtes cross-partitions). Pour le volume attendu d'un WMS PME (quelques millions de lignes max), des index bien posés suffisent. Le partitionnement = évolution V2 si le volume explose. »
