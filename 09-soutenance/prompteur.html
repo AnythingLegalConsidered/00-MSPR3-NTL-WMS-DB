@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Téléprompteur — Soutenance MSPR3 NTL WMS</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 16px; font-weight: 600; color: #58a6ff; }
+  .meta { font-size: 13px; color: #8b949e; }
+  .meta span { margin-left: 16px; }
+  .meta .orateur { color: #f0883e; font-weight: 600; }
+  .meta .time { color: #3fb950; }
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px 60px;
+    scroll-behavior: smooth;
+  }
+  .slide {
+    max-width: 900px;
+    margin: 0 auto 60px;
+    padding: 32px;
+    border-radius: 12px;
+    border: 1px solid #30363d;
+    background: #161b22;
+    transition: border-color 0.2s;
+  }
+  .slide.active { border-color: #58a6ff; box-shadow: 0 0 20px rgba(88,166,255,0.15); }
+  .slide-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  .slide-num {
+    background: #58a6ff;
+    color: #0d1117;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .slide-title { font-size: 20px; font-weight: 600; }
+  .slide-info { font-size: 13px; color: #8b949e; margin-left: auto; }
+  .section { margin-bottom: 20px; }
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .section-label.ecran { color: #d2a8ff; }
+  .section-label.dire { color: #3fb950; }
+  .section-label.piège { color: #f85149; }
+  .ecran-text { color: #d2a8ff; font-size: 15px; font-style: italic; }
+  .dire-text {
+    color: #e6edf3;
+    font-size: 18px;
+    line-height: 1.7;
+    padding: 16px 20px;
+    background: #0d1117;
+    border-radius: 8px;
+    border-left: 3px solid #3fb950;
+  }
+  .piege-text {
+    color: #ffa198;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 12px 16px;
+    background: rgba(248,81,73,0.08);
+    border-radius: 8px;
+    border-left: 3px solid #f85149;
+  }
+  footer {
+    background: #161b22;
+    border-top: 1px solid #30363d;
+    padding: 10px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { background: #30363d; border-color: #58a6ff; }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .progress {
+    font-size: 13px;
+    color: #8b949e;
+    min-width: 80px;
+    text-align: center;
+  }
+  .timer {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 14px;
+    color: #3fb950;
+    background: #0d1117;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #30363d;
+  }
+  .help {
+    font-size: 11px;
+    color: #484f58;
+  }
+  @media (max-width: 768px) {
+    main { padding: 20px; }
+    .slide { padding: 20px; }
+    .dire-text { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Téléprompteur — Soutenance MSPR3 NTL WMS</h1>
+  <div class="meta">
+    <span class="orateur" id="currentOrateur"></span>
+    <span class="time" id="currentTime"></span>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<footer>
+  <button class="nav-btn" id="prevBtn" onclick="go(-1)">← Précédent</button>
+  <span class="progress" id="progress"></span>
+  <span class="timer" id="timer">00:00</span>
+  <button class="nav-btn" id="nextBtn" onclick="go(1)">Suivant →</button>
+  <span class="help">↑↓ ou Espace pour naviguer</span>
+</footer>
+
+<script>
+const slides = [
+  {
+    num: 1, title: "Titre", orateur: "Ianis", time: "0:30",
+    ecran: "Titre du projet, l'équipe, un résumé en anglais.",
+    dire: "Bonjour. Nous sommes Ianis, Blaise, Ojvind et Zaid, et nous allons vous présenter notre travail sur l'industrialisation de la base de données du WMS de NordTransit Logistics — le système qui pilote leurs entrepôts. Je vais commencer par poser le contexte et notre démarche, puis mes collègues dérouleront la conception du modèle, l'architecture, la sécurité et l'exploitation. On terminera par les difficultés qu'on a rencontrées et nos perspectives.",
+    pieges: []
+  },
+  {
+    num: 2, title: "Contexte & enjeu", orateur: "Ianis", time: "1:30",
+    ecran: "NTL en bref, criticité du WMS, contraintes, existant fragile.",
+    dire: "NordTransit Logistics, c'est une PME logistique des Hauts-de-France : un siège à Lille, trois entrepôts — Lens, Valenciennes, Arras — et un cross-dock saisonnier. Leur cœur de métier, c'est le WMS, le système de gestion d'entrepôt. Concrètement : si cette base tombe, ce sont les quatre sites qui s'arrêtent — plus de réceptions, plus d'expéditions, sur toute la journée d'activité, de 5h30 à 18h30. Et aujourd'hui, l'existant est fragile : une base MySQL sur une seule machine, des sauvegardes sur un NAS qui ne sont jamais testées, et aucun objectif de reprise défini. On peut intervenir presque uniquement la nuit, avec une équipe IT réduite. C'est tout l'enjeu de notre mission : rendre cette base fiable, sûre et résiliente.",
+    pieges: ["Pourquoi si critique ? → l'arrêt du WMS = quais bloqués = chiffre d'affaires à l'arrêt sur les 4 sites, en direct."]
+  },
+  {
+    num: 3, title: "Démarche & pilotage projet", orateur: "Ianis", time: "1:30",
+    ecran: "Équipe et rôles, méthode, décisions tracées, registre des risques.",
+    dire: "Nous étions quatre, sur un budget de dix-neuf heures. Deux sur le modèle de données — Blaise et moi — et deux sur l'infrastructure et l'exploitation — Ojvind et Zaid. On a travaillé en quatre temps : cadrage, conception, industrialisation, puis documentation. Chaque décision structurante a été tracée dans un journal de décisions : on en a six, là où le sujet en demande au moins trois. On tient aussi un registre de neuf risques, avec impacts et mesures. Et dès le cadrage, on a heurté une ambiguïté de fond dans le sujet — j'y reviens à la fin, parce que c'est elle qui a structuré tout le reste de notre travail.",
+    pieges: []
+  },
+  {
+    num: 4, title: "Modèle Conceptuel de Données (MCD)", orateur: "Blaise (+ Ianis)", time: "2:00",
+    ecran: "Le diagramme MCD (7 entités, 8 associations) + un panneau « points clés ».",
+    dire: "Le modèle compte huit tables : sept entités et une table associative, commande. On y retrouve tout ce que demande le cahier des charges : les clients, les sites, les articles avec leurs dimensions et leur poids, les localisations, le stock actuel, et les mouvements horodatés. Le point de conception le plus important, c'est le stock : pour nous, une ligne de stock, c'est un article, à un emplacement, avec une quantité — pas plus. Cinquante palettes du même article au même endroit, c'est une seule ligne avec quantité cinquante. Côté intégrité, tout est porté par le schéma lui-même : des clés étrangères, des contraintes CHECK, des UNIQUE, et un ON DELETE RESTRICT partout pour ne jamais détruire l'historique des mouvements. On est en troisième forme normale, et sans aucun trigger : le modèle reste simple et lisible.",
+    pieges: [
+      "Pourquoi mouvement.id_client peut être vide ? → une sortie vers un client, on renseigne le client ; un mouvement interne — transfert, inventaire — n'a pas de client, donc c'est NULL.",
+      "Les types de mouvement ? → quatre valeurs verrouillées par un CHECK : entrée, sortie, ajustement, transfert. La quantité reste toujours positive ; c'est le type qui porte le sens.",
+      "Pourquoi le fournisseur n'est pas une entité ? → les achats sont gérés par l'ERP commercial de NTL, hors périmètre WMS. Un attribut texte suffit à tracer l'origine. Entité FOURNISSEUR en V2 si intégration."
+    ]
+  },
+  {
+    num: 5, title: "Optimisation & performance", orateur: "Blaise", time: "1:00",
+    ecran: "Démarche par usages, requêtes types, index, choix physiques.",
+    dire: "Sur les performances, on est parti des usages réels plutôt que d'indexer au hasard. Les requêtes les plus fréquentes, ce sont le stock d'un article ou d'un site, les mouvements sur une période, et la recherche d'un article. On a donc posé des index ciblés là-dessus — notamment sur le couple site-article et sur la date des mouvements. Et on a choisi des types légers, des entiers non signés pour les clés étrangères, ce qui garde les jointures rapides. Bref : on optimise là où ça sert, en fonction de comment la base va vraiment être interrogée.",
+    pieges: []
+  },
+  {
+    num: 6, title: "Choix du SGBD", orateur: "Ojvind", time: "1:00",
+    ecran: "MariaDB 11.4 LTS, l'argument de continuité, PostgreSQL écarté.",
+    dire: "Pour le SGBD, on a retenu MariaDB 11.4 LTS, supportée jusqu'en 2029. L'argument numéro un, c'est la continuité : l'existant tourne déjà sous MySQL, et MariaDB en est un remplaçant direct. La migration est donc quasi nulle, et l'équipe IT n'a pas besoin d'être reformée. On a regardé PostgreSQL, mais il aurait fallu réécrire une partie de l'application — le pilote, le dialecte SQL, les types — et l'équipe n'a pas cette compétence. Notre position, ce n'est pas de dire « MariaDB est meilleur dans l'absolu » : c'est « c'est le meilleur compromis dans ce contexte précis ».",
+    pieges: []
+  },
+  {
+    num: 7, title: "Architecture Haute Disponibilité", orateur: "Ojvind", time: "1:30",
+    ecran: "Schéma : WMS-APP → HAProxy → Master → 2 réplicas (HA local + PRA distant).",
+    dire: "Voici l'architecture de haute disponibilité. L'application passe par HAProxy, qui l'aiguille vers le serveur maître — celui qui reçoit toutes les écritures. Ce maître réplique en continu vers deux serveurs. Le premier est un réplica local : il couvre une panne de service ou de machine sur le site. Le second est un réplica distant : il couvre la perte complète du site de Lille. La réplication est asynchrone, avec les journaux binaires : c'est simple à exploiter et ça pèse peu sur le maître, ce qui est adapté à une petite équipe. La réplication synchrone, de type Galera, on la garde comme évolution possible en V2.",
+    pieges: []
+  },
+  {
+    num: 8, title: "PRA, sauvegardes & restauration", orateur: "Zaid", time: "2:00",
+    ecran: "Scénarios de bascule + RTO, RPO via binlogs, scripts de sauvegarde, tests.",
+    dire: "La continuité, c'est le cœur du sujet : on nous demande un temps de reprise d'une heure et une perte de données maximale de quinze minutes. On les tient, avec de la marge. Une panne de service ou de machine, c'est une bascule HAProxy en cinq à dix minutes. La perte du site, c'est le passage sur le réplica distant en vingt à quarante minutes — donc bien sous l'heure. Les quinze minutes de perte maximale sont garanties par les journaux binaires. Côté sauvegardes, tout est automatisé et scripté : une sauvegarde complète chaque nuit avec mariabackup, l'archivage transactionnel en continu, la rotation et la rétention, la vérification, et la notification en cas d'échec. Et surtout, on planifie les tests de restauration — parce qu'une sauvegarde qu'on n'a jamais restaurée, ce n'est pas une sauvegarde.",
+    pieges: ["Sauvegarde incrémentale ? → l'archivage des journaux binaires joue ce rôle : il capture chaque transaction entre deux complètes, ce qui donne le RPO de quinze minutes."]
+  },
+  {
+    num: 9, title: "Sécurité des accès", orateur: "Zaid", time: "1:00",
+    ecran: "Moindre privilège, comptes séparés, MFA, secrets.",
+    dire: "Sur les accès, on applique le principe de moindre privilège. L'application se connecte avec un compte qui a uniquement le strict nécessaire sur les tables métier — jamais un compte administrateur. L'administration passe par un compte séparé, protégé par une double authentification. Les secrets sont dans un coffre, jamais en clair dans un fichier de configuration. Et les comptes sont nominatifs, pour qu'on puisse tracer qui fait quoi.",
+    pieges: []
+  },
+  {
+    num: 10, title: "Note Comité de direction (risques cyber)", orateur: "Zaid", time: "1:30",
+    ecran: "5 risques en langage direction, plan priorisé, RGPD.",
+    dire: "Le sujet demandait une note destinée au comité de direction — donc un langage non technique, orienté métier. On a identifié cinq risques cyber majeurs : l'arrêt prolongé de la base, le vol d'un accès, un ransomware qui rendrait les sauvegardes inutilisables, l'exfiltration des données clients, et la perte de traçabilité réglementaire. Pour chacun, on parle impact business, pas jargon. Et on propose un plan d'action priorisé en trois vagues : l'immédiat sur six semaines, puis à trois mois, puis à six mois. On rappelle aussi l'obligation RGPD de notifier une fuite sous soixante-douze heures. L'idée, c'est de faire adhérer la direction en parlant son langage.",
+    pieges: []
+  },
+  {
+    num: 11, title: "Supervision", orateur: "Ojvind", time: "1:30",
+    ecran: "Stack Prometheus/Grafana, 5 indicateurs + seuils reliés à un objectif.",
+    dire: "Pour la supervision, on propose un tableau de bord de cinq indicateurs critiques, sous Prometheus et Grafana. Ces cinq indicateurs : la latence des requêtes, le nombre de connexions actives, le retard de réplication, l'espace disque libre, et le succès des sauvegardes. Le point important, c'est qu'on ne surveille pas pour surveiller : chaque seuil est relié à un objectif concret. Par exemple, si le retard de réplication dépasse trente secondes, c'est notre RPO de quinze minutes qui est menacé. Si le disque descend sous dix pour cent, MariaDB peut s'arrêter. Et chaque alerte a sa procédure d'analyse associée.",
+    pieges: []
+  },
+  {
+    num: 12, title: "Exploitation : RunBook & analyse de logs", orateur: "Zaid", time: "1:30",
+    ecran: "RunBook (start/stop, checklists, incident, escalade), 5 sources de logs.",
+    dire: "L'exploitation au quotidien, c'est le RunBook. Il couvre le démarrage et l'arrêt, les contrôles de santé, les checklists quotidiennes et hebdomadaires, la procédure d'incident de bout en bout — de la détection au retour à la normale — et une matrice d'escalade du niveau 1 au niveau 4, avec des délais cibles. Sur les logs, on a identifié cinq sources : les erreurs, les requêtes lentes, les journaux binaires, HAProxy et les sauvegardes. Et pour chacune, on a cartographié les patterns critiques et la façon de les corréler, pour diagnostiquer vite quand quelque chose ne va pas.",
+    pieges: []
+  },
+  {
+    num: 13, title: "Difficultés rencontrées → solutions", orateur: "Ianis", time: "1:30",
+    ecran: "Le pivot de cadrage : ambiguïté grossiste / 3PL → postulat assumé.",
+    dire: "Voici la difficulté que je vous annonçais. Le sujet est ambigu : « PME logistique » avec « séparation des données par client », ça peut se lire de deux façons. Soit NTL est un grossiste, qui gère son propre stock. Soit c'est un prestataire logistique, qui héberge le stock de ses clients — ce qu'on appelle du 3PL. Et ces deux lectures mènent à des modèles très différents. Plutôt que de rester dans le flou, on a tranché : on a posé un postulat explicite — grossiste — et on l'a tracé dans une décision, l'ADR numéro 3. C'est une démarche d'itération maîtrisée, pas du tâtonnement. Conséquence assumée : l'isolation multi-tenant est reportée en V2. Et je veux être transparent avec vous : le DDL n'a pas encore été exécuté sur une vraie instance — c'est notre première perspective, ce n'est pas quelque chose qu'on cache.",
+    pieges: [
+      "LE piège attendu — « Où est la séparation par client ? Je ne vois pas d'isolation forte. » → Sous notre postulat grossiste, le stock appartient à NTL. La séparation pertinente, c'est donc l'attribution : on sait parfaitement qui a commandé et reçu quoi, grâce à mouvement.id_client et à la table commande. L'isolation forte — un client ne voit jamais les données d'un autre — ne se justifie qu'en modèle 3PL, qu'on a explicitement réservé à une V2. C'est un arbitrage tracé dans l'ADR 3, pas un oubli."
+    ]
+  },
+  {
+    num: 14, title: "Résultats & perspectives V2", orateur: "Blaise", time: "1:30",
+    ecran: "Ce qui est livré, les chiffres-clés, la roadmap V2.",
+    dire: "Pour les résultats : on livre huit livrables qui couvrent l'intégralité du cahier des charges. En chiffres : huit tables en troisième forme normale, une architecture qui tient le temps de reprise d'une heure et la perte maximale de quinze minutes, trois serveurs de base, cinq indicateurs de supervision, six décisions tracées. Et chaque limite qu'on a posée renvoie à une décision documentée — jamais à un oubli. Nos perspectives V2 sont claires : d'abord exécuter le DDL sur une instance, ensuite le multi-tenant si NTL bascule vers du 3PL, puis la gestion des lots et des dates de péremption, les expéditions, et la réplication synchrone. On a livré un socle solide — un MVP industrialisable, pas une maquette.",
+    pieges: []
+  },
+  {
+    num: 15, title: "Conclusion", orateur: "Toute l'équipe", time: "0:30",
+    ecran: "Synthèse + fil rouge + ouverture questions.",
+    dire: "Pour conclure : on a conçu une base WMS pensée pour être sûre, supervisée et résiliente — un socle industrialisable. Et s'il fallait retenir une seule chose de notre démarche : face à un sujet ambigu, on a tranché par un postulat assumé et tracé, plutôt que de rester dans le flou. Merci de votre attention — nous sommes à votre disposition pour vos questions.",
+    pieges: []
+  }
+];
+
+let current = 0;
+let timerStart = null;
+let timerInterval = null;
+
+function render() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  slides.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'slide' + (i === current ? ' active' : '');
+    div.id = 'slide-' + i;
+    let html = `
+      <div class="slide-header">
+        <span class="slide-num">S${s.num}</span>
+        <span class="slide-title">${s.title}</span>
+        <span class="slide-info">${s.orateur} · ${s.time}</span>
+      </div>
+      <div class="section">
+        <div class="section-label ecran">🖥️ À l'écran</div>
+        <div class="ecran-text">${s.ecran}</div>
+      </div>
+      <div class="section">
+        <div class="section-label dire">🎤 À dire</div>
+        <div class="dire-text">${s.dire}</div>
+      </div>`;
+    if (s.pieges && s.pieges.length) {
+      html += `<div class="section"><div class="section-label piège">💡 Si on vous pose la question</div>`;
+      s.pieges.forEach(p => { html += `<div class="piege-text">${p}</div>`; });
+      html += `</div>`;
+    }
+    div.innerHTML = html;
+    main.appendChild(div);
+  });
+  updateMeta();
+}
+
+function updateMeta() {
+  const s = slides[current];
+  document.getElementById('currentOrateur').textContent = s.orateur;
+  document.getElementById('currentTime').textContent = s.time;
+  document.getElementById('progress').textContent = `${current + 1} / ${slides.length}`;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === slides.length - 1;
+  const el = document.getElementById('slide-' + current);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function go(dir) {
+  const next = current + dir;
+  if (next < 0 || next >= slides.length) return;
+  current = next;
+  updateMeta();
+  if (!timerStart) startTimer();
+}
+
+function startTimer() {
+  timerStart = Date.now();
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const sec = String(elapsed % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = `${m}:${sec}`;
+  }, 1000);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { e.preventDefault(); current = 0; updateMeta(); }
+  if (e.key === 'End') { e.preventDefault(); current = slides.length - 1; updateMeta(); }
+});
+
+render();
+</script>
+</body>
+</html>
