@@ -1,5 +1,7 @@
 # FAQ Soutenance — MCD / MLD WMS-DB
 
+> ⚠️ **OBSOLÈTE — modèle V4 multi-tenant ABANDONNÉ.** Cette FAQ défend des features (FOURNISSEUR entité, option D, triggers, bug MariaDB) qui **ne sont PAS dans le dossier rendu** (grossiste V2). **Utilise [`../FAQ.md`](../FAQ.md) à la racine** pour réviser.
+
 > Réponses prêtes à défendre, droit au but. Si tu vas plus loin que la réponse écrite ici, tu improvises au-delà du périmètre tranché — risqué.
 
 ## MCD — choix structurants

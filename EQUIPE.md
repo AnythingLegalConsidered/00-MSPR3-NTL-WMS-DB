@@ -10,21 +10,22 @@ Concevoir la base de données du WMS (Warehouse Management System) de **NordTran
 
 | Membre | Rôle | Livrables principaux |
 |---|---|---|
-| Ianis | Lead, architecture | MCD, MLD, DDL, coordination |
-| Blaise | — | à répartir |
-| Zaid | — | à répartir |
-| Ojvind | — | à répartir |
+| Ianis | Lead, modèle de données | MCD, MLD, DDL, décisions, coordination |
+| Blaise | Modèle de données | MCD, MLD, DDL |
+| Ojvind (_tequilla77_) | Infrastructure / exploitation | PRA, supervision, runbook, optim, logs, migration |
+| Zaid | Infrastructure / exploitation | PRA, supervision, runbook, optim, logs |
 
 ## Décisions verrouillées (ne pas rouvrir)
 
 Ces décisions sont **tranchées**. Si tu penses qu'une est fausse, ouvre la discussion avant de modifier quoi que ce soit.
 
 - **SGBD** : MariaDB 11.4 LTS
-- **MCD à 8 entités** (V4) : CLIENT, ARTICLE, FOURNISSEUR, SITE, EMPLACEMENT, STOCK, MOUVEMENT, UTILISATEUR. Modèle 14 entités (lots/FEFO, commandes, expéditions, transporteurs) reporté en V2.
-- **Multi-tenant** : FK composite `(id_article, id_client)` (« option D ») + association `realise_pour` visible au MCD.
-- **TRANSFERT intra-site** : garanti déclarativement par dénormalisation `mouvements.id_site` + FK composites vers `emplacements`.
+- **Postulat métier : NTL = grossiste** (stock propre, pas 3PL) — [`decisions/0003-postulats-cadrage-ntl.md`](decisions/0003-postulats-cadrage-ntl.md). Sujet ambigu → postulat explicite.
+- **MCD V2 grossiste, 8 tables** : SITE, LOCALISATION, ARTICLE, CLIENT, STOCK, MOUVEMENT, UTILISATEUR + table associative `commande`. Lots/FEFO, expéditions, transporteurs reportés V2.
+- **Séparation par client = attribution** : `mouvement.id_client` (nullable) + `commande`. **Pas** de multi-tenant (isolation) en V1 — évolution V2 si bascule 3PL.
+- **Fournisseur** = attribut texte `article.fournisseur` (pas d'entité). Achats hors périmètre V1.
 - **Surrogate keys** `id_*` partout au MLD, code métier conservé en `UNIQUE`.
-- **Triggers minimisés** : règles d'intégrité portées par FK composites + CHECK partout où possible. Exception : 2 triggers sur `mouvements` (`tg_mvt_src_dst_ins`, `tg_mvt_src_dst_upd`) forcés par un bug parser MariaDB 11.4 — cf. [`01-architecture-technique/ddl/wms-ddl.md`](01-architecture-technique/ddl/wms-ddl.md) §5.bis et [`decisions/0001-bug-mariadb-check.md`](decisions/0001-bug-mariadb-check.md).
+- **Aucun trigger, aucune FK composite** : intégrité par FK simples + CHECK + UNIQUE. (L'ancien contournement par triggers d'un bug MariaDB ne s'applique plus depuis le pivot grossiste — [`decisions/0001-bug-mariadb-check.md`](decisions/0001-bug-mariadb-check.md) superseded.)
 
 Détail et justifications → [`FAQ.md`](FAQ.md).
 
@@ -33,7 +34,7 @@ Détail et justifications → [`FAQ.md`](FAQ.md).
 | Tu cherches… | Va dans |
 |---|---|
 | Le modèle conceptuel officiel | [`01-architecture-technique/mcd/wms-mcd.md`](01-architecture-technique/mcd/wms-mcd.md) |
-| Le diagramme MCD visuel | [`01-architecture-technique/mcd/wms-mcd.svg`](01-architecture-technique/mcd/wms-mcd.svg) |
+| Le diagramme MCD visuel | [`01-architecture-technique/mcd/wms-mcd.png`](01-architecture-technique/mcd/wms-mcd.png) |
 | Le modèle logique (tables, FK, contraintes) | [`01-architecture-technique/mld/wms-mld.md`](01-architecture-technique/mld/wms-mld.md) |
 | Le DDL exécutable + sa doc | [`01-architecture-technique/ddl/`](01-architecture-technique/ddl/) |
 | Le pourquoi d'une décision (synthèse) | [`07-gestion-projet/journal-decisions.md`](07-gestion-projet/journal-decisions.md) |
@@ -52,15 +53,15 @@ Voir le `README.md` de chaque dossier `0N-…/` pour : statut détaillé, conten
 
 | # | Dossier | Statut |
 |---|---|---|
-| 1 | [`01-architecture-technique/`](01-architecture-technique/) | 🟡 MCD ✅ MLD ✅ DDL ✅ — reste justif SGBD + schémas + politiques |
-| 2 | [`02-pra/`](02-pra/) | ⏳ |
-| 3 | [`03-supervision/`](03-supervision/) | ⏳ |
-| 4 | [`04-optimisation/`](04-optimisation/) | ⏳ |
-| 5 | [`05-runbook/`](05-runbook/) | ⏳ |
-| 6 | [`06-analyse-logs/`](06-analyse-logs/) | ⏳ |
-| 7 | [`07-gestion-projet/`](07-gestion-projet/) | 🟡 journal-decisions + registre-risques amorcés |
-| 8 | [`08-note-direction/`](08-note-direction/) | ⏳ |
-| 9 | [`09-soutenance/`](09-soutenance/) | ⏳ |
+| 1 | [`01-architecture-technique/`](01-architecture-technique/) | 🟢 MCD/MLD/DDL V2 grossiste ✅ — DDL ⚠️ pas encore exécuté |
+| 2 | [`02-pra/`](02-pra/) | 🟢 rédigé |
+| 3 | [`03-supervision/`](03-supervision/) | 🟢 rédigé |
+| 4 | [`04-optimisation/`](04-optimisation/) | 🟢 rédigé |
+| 5 | [`05-runbook/`](05-runbook/) | 🟢 rédigé |
+| 6 | [`06-analyse-logs/`](06-analyse-logs/) | 🟢 rédigé |
+| 7 | [`07-gestion-projet/`](07-gestion-projet/) | 🟡 journal (6) + risques (9) — reste planning + suivi tâches |
+| 8 | [`08-note-direction/`](08-note-direction/) | 🟢 rédigée |
+| 9 | [`09-soutenance/`](09-soutenance/) | 🟡 plan défini, support à produire |
 
 ## Workflow Git
 

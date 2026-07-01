@@ -11,11 +11,11 @@
 - [ ] Plan de présentation (~20 min, donc ~10-15 slides) :
   1. Contexte NTL (1 slide)
   2. Démarche projet + équipe (1 slide)
-  3. Modèle de données — MCD/MLD (3 slides : diagramme + décisions structurantes)
-  4. Architecture HA/PRA — Galera + sauvegardes (2 slides)
+  3. Modèle de données — MCD/MLD V2 grossiste (3 slides : diagramme + décisions structurantes) — **orateurs : Ianis + Blaise**
+  4. Architecture HA/PRA — réplication MariaDB + sauvegardes (2 slides) — **orateurs : Ojvind + Zaid**
   5. Sécurité + supervision (2 slides)
   6. RunBook + analyse logs (1 slide)
-  7. Difficultés rencontrées + solutions (2 slides) — **bug MariaDB ici**
+  7. Difficultés rencontrées + solutions (2 slides) — **pivot de cadrage ici** : ambiguïté grossiste/3PL du sujet → postulat grossiste explicite (ADR 0003), simplification du modèle (multi-tenant reporté V2). Démarche d'itération maîtrisée, pas un tâtonnement.
   8. Résultats obtenus + perspectives V2 (1 slide)
   9. Conclusion + questions (1 slide)
 - [ ] Répartition orateurs (chaque membre parle au moins une fois)

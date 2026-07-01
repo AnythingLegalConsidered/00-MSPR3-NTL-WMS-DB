@@ -16,6 +16,8 @@ related:
 
 # Arbitrages V4 — réponse aux 5 attaques soutenance
 
+> ⚠️ **HISTORIQUE — modèle V4 multi-tenant ABANDONNÉ** (pivot grossiste V2 le 2026-05-22, cf. [`../decisions/0003-postulats-cadrage-ntl.md`](../decisions/0003-postulats-cadrage-ntl.md)). Conservé comme trace d'itération. **Ne pas utiliser pour la soutenance** — le modèle rendu n'a ni FOURNISSEUR entité, ni option D, ni triggers.
+
 > Round d'arbitrages après revue critique du MCD V3 officiel par Claude le 2026-05-21. 5 points d'attaque potentiels identifiés en soutenance + détails mineurs. Tranchés par Ianis pour produire une V4 « inattaquable » sur les points majeurs.
 
 ## Contexte

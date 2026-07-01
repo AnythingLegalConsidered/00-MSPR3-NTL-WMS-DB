@@ -30,7 +30,7 @@ La présente note expose les cinq risques majeurs identifiés, leurs conséquenc
 | 1 | **Arrêt prolongé de la base** | Une panne dépasse l'heure de reprise visée et bloque les quatre sites en pleine journée | Moyenne | Critique |
 | 2 | **Vol d'un accès applicatif** | Un compte technique du WMS est compromis (mot de passe volé, hameçonnage) et donne lecture/écriture sur les données | Faible | Critique |
 | 3 | **Ransomware avec sauvegardes inutilisables** | Un chiffreur frappe la base **et** les sauvegardes (parce qu'elles ne sont pas externalisées et jamais testées) | Moyenne | Critique |
-| 4 | **Fuite croisée de données clients** | Un client voit accidentellement les stocks ou commandes d'un autre client (défaut d'étanchéité multi-tenant) | Faible | Élevée |
+| 4 | **Exfiltration des données commerciales clients** | Les commandes, volumes et coordonnées de nos clients (dont les comptes-clés) sont consultés ou exfiltrés par un accès indu | Faible | Élevée |
 | 5 | **Perte de traçabilité réglementaire** | Les journaux d'audit sont absents ou effaçables, rendant impossible toute enquête après incident | Moyenne | Élevée |
 
 ## 3. Impact métier
@@ -42,7 +42,7 @@ La présente note expose les cinq risques majeurs identifiés, leurs conséquenc
 | **1. Arrêt prolongé** | Quais bloqués sur les 4 sites, réception et expédition figées, escalade vers transporteurs et clients, perte de créneaux de livraison, activation des pénalités contractuelles | **Critique** |
 | **2. Vol d'accès** | Modifications silencieuses des stocks, exfiltration possible des données clients, vols internes facilités, perte de confiance commerciale | **Critique** |
 | **3. Ransomware** | Activité à l'arrêt plusieurs jours, pression d'une demande de rançon, reprise dégradée via procédures papier, communication de crise à gérer | **Critique** |
-| **4. Fuite multi-tenant** | Un client constate qu'il voit (ou pourrait voir) les données d'un autre client : perte de confiance immédiate, résiliation possible, effet de contagion commerciale | **Élevé** |
+| **4. Exfiltration données commerciales** | Divulgation des volumes, commandes et conditions de nos clients : perte de confiance, avantage donné à un concurrent, résiliation possible des comptes-clés | **Élevé** |
 | **5. Perte de traçabilité** | Impossibilité de prouver notre conformité lors d'un litige client, d'un contrôle ou d'un sinistre, refus possible de l'assureur cyber d'indemniser | **Élevé** |
 
 ## 4. Plan d'action proposé

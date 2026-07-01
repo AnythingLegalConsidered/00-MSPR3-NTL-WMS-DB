@@ -1,5 +1,7 @@
 # brief-ia — interroger une IA sur le projet
 
+> ⚠️ **OBSOLÈTE — décrit le modèle V4 multi-tenant ABANDONNÉ.** Le projet a pivoté vers un modèle **grossiste V2** (8 tables, pas de multi-tenant, pas de triggers). **Ne donne pas ce dossier à une IA pour préparer la soutenance** : tu obtiendrais des réponses sur un modèle non rendu. Sources à jour : [`../FAQ.md`](../FAQ.md), [`../decisions/0003-postulats-cadrage-ntl.md`](../decisions/0003-postulats-cadrage-ntl.md), DDL réel [`../01-architecture-technique/ddl/wms-schema.sql`](../01-architecture-technique/ddl/wms-schema.sql).
+
 **Objectif** : permettre à n'importe qui de l'équipe de demander à une IA externe (Claude Desktop, ChatGPT, Gemini, etc.) *pourquoi tel choix a été fait*, *qu'est-ce que telle décision implique*, ou *comment défendre telle position en soutenance*.
 
 ## Mode d'emploi (2 min)

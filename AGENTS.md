@@ -8,12 +8,13 @@ MSPR3 EPSI Nantes — conception base de données WMS pour NordTransit Logistics
 
 ## Décisions verrouillées — NE PAS rouvrir
 
-- MCD V4 à 8 entités (CLIENT, ARTICLE, FOURNISSEUR, SITE, EMPLACEMENT, STOCK, MOUVEMENT, UTILISATEUR)
-- Multi-tenant : FK composite option D `(id_article, id_client)`
-- TRANSFERT intra-site : dénormalisation `mouvements.id_site` + FK composites
+- **Postulat métier : NTL = grossiste** (stock propre, pas 3PL) — `decisions/0003-postulats-cadrage-ntl.md`
+- **MCD V2 grossiste, 8 tables** (SITE, LOCALISATION, ARTICLE, CLIENT, STOCK, MOUVEMENT, UTILISATEUR + `commande`)
+- **Pas de multi-tenant** : séparation client = attribution (`mouvement.id_client`, `commande`). Isolation = évolution V2 si 3PL.
+- **Fournisseur** = attribut texte `article.fournisseur` (pas d'entité)
 - Surrogate keys `id_*` au MLD, code métier en UNIQUE
-- ENUM pour domaines de valeurs, CHECK pour contraintes conditionnelles
-- Triggers minimisés (exception : `ck_mvt_src_dst` porté par triggers à cause d'un bug parser MariaDB 11.4 — cf. `01-architecture-technique/ddl/wms-ddl.md` §5.bis et `decisions/0001-bug-mariadb-check.md`)
+- **Aucun trigger, aucune FK composite** : intégrité par FK simples + CHECK + UNIQUE
+- ⚠️ L'ancien modèle V4 multi-tenant (FK composite option D, triggers, bug MariaDB) est **ABANDONNÉ** — ne pas le réintroduire. ADR 0001 superseded.
 
 Si une décision semble incohérente : **propose un workaround MLD/DDL, ne rouvre pas le MCD**.
 

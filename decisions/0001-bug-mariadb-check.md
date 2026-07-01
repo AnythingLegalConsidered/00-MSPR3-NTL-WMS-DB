@@ -1,7 +1,7 @@
 ---
 id: "0001"
 titre: "Bug parser MariaDB 11.4 — CHECK rejeté en présence des FK composites"
-statut: "OUVERT — contournement temporaire actif (triggers), décision finale à prendre"
+statut: "SUPERSEDED — 2026-05-22 par ADR 0003 (pivot grossiste). Sans objet sur le modèle V2."
 created: "2026-05-22"
 updated: "2026-05-22"
 owner: "Ianis"
@@ -14,6 +14,8 @@ related:
 ---
 
 # 0001 — Bug parser MariaDB 11.4 sur les CHECK de `mouvements`
+
+> ⚠️ **SUPERSEDED par [ADR 0003](0003-postulats-cadrage-ntl.md).** Cet ADR documente une investigation menée sous l'**ancien modèle multi-tenant** (V4), où `mouvements` portait `id_depart`/`id_arrivee` et des FK composites `(id_depart, id_site)`. Le pivot grossiste (modèle V2) a **supprimé ces colonnes et ces FK composites** : `mouvement` ne référence plus qu'un seul `id_stock`. **Le bug ne se déclenche donc plus** et le DDL V2 (`wms-schema.sql`) ne contient **aucun trigger**. Conservé comme trace d'investigation technique.
 
 ## Problème en 3 lignes
 

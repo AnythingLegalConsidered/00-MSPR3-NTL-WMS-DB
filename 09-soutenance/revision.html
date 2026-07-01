@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Révision Soutenance — MSPR3 NTL WMS</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3e;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --red: #f87171;
+    --orange: #fb923c;
+    --yellow: #fbbf24;
+    --green: #4ade80;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --accent: #3b82f6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.6;
+    padding-bottom: 2rem;
+  }
+
+  /* ── STICKY HEADER ── */
+  #header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #13151f;
+    border-bottom: 2px solid var(--accent);
+    padding: 0.6rem 1rem;
+  }
+
+  #fil-rouge {
+    background: linear-gradient(135deg, #1e3a5f, #1a2744);
+    border-left: 4px solid var(--blue);
+    border-radius: 6px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.82rem;
+    color: var(--blue);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    margin-bottom: 0.5rem;
+  }
+
+  #fil-rouge span { color: var(--text); font-weight: 400; }
+
+  #nav-toggle {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+  }
+
+  #nav-menu {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-top: 0.4rem;
+    overflow: hidden;
+  }
+
+  #nav-menu.open { display: block; }
+
+  #nav-menu a {
+    display: block;
+    padding: 0.55rem 1rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #nav-menu a:last-child { border-bottom: none; }
+  #nav-menu a:hover { background: var(--border); color: var(--text); }
+
+  /* ── MAIN CONTENT ── */
+  main { padding: 1rem; max-width: 800px; margin: 0 auto; }
+
+  /* ── SECTION ACCORDION ── */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 0.8rem;
+    overflow: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    gap: 0.5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .section-header:hover { background: rgba(255,255,255,0.03); }
+
+  .section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-icon { font-size: 1.1em; }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .section.open .chevron { transform: rotate(180deg); }
+
+  .section-body {
+    display: none;
+    padding: 0 1rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .section.open .section-body { display: block; }
+
+  /* ── TYPOGRAPHY ── */
+  h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 1.2rem 0 0.5rem;
+  }
+
+  h3:first-child { margin-top: 0.8rem; }
+
+  p { margin: 0.4rem 0; font-size: 0.9rem; }
+
+  strong { color: var(--text); }
+
+  code {
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 0.8em;
+    background: rgba(255,255,255,0.08);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    color: #e2e8f0;
+  }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.8rem 0;
+    font-size: 0.88rem;
+    border-left: 3px solid;
+  }
+
+  .callout-red    { background: rgba(248,113,113,0.08); border-color: var(--red);    color: #fca5a5; }
+  .callout-orange { background: rgba(251,146,60,0.08);  border-color: var(--orange); color: #fdba74; }
+  .callout-green  { background: rgba(74,222,128,0.08);  border-color: var(--green);  color: #86efac; }
+  .callout-blue   { background: rgba(96,165,250,0.08);  border-color: var(--blue);   color: #93c5fd; }
+
+  .callout strong { color: inherit; }
+  .callout-title { font-weight: 700; margin-bottom: 0.3rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; margin: 0.8rem 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    min-width: 320px;
+  }
+
+  th {
+    background: rgba(255,255,255,0.06);
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    padding: 0.5rem 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.5rem 0.7rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .val-key { color: var(--yellow); font-weight: 700; font-family: monospace; }
+
+  /* ── Q&A ITEMS ── */
+  .qa {
+    margin: 0.8rem 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .qa-q {
+    padding: 0.65rem 0.9rem;
+    background: rgba(251,146,60,0.07);
+    font-size: 0.87rem;
+    font-weight: 600;
+    color: #fdba74;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .qa-q .qa-chevron { flex-shrink: 0; font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
+  .qa.open .qa-chevron { transform: rotate(180deg); }
+
+  .qa-a {
+    display: none;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.86rem;
+    line-height: 1.65;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .qa.open .qa-a { display: block; }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15em 0.5em;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+
+  .tag-red    { background: rgba(248,113,113,0.15); color: var(--red); }
+  .tag-orange { background: rgba(251,146,60,0.15);  color: var(--orange); }
+  .tag-green  { background: rgba(74,222,128,0.15);  color: var(--green); }
+  .tag-blue   { background: rgba(96,165,250,0.15);  color: var(--blue); }
+  .tag-purple { background: rgba(167,139,250,0.15); color: var(--purple); }
+
+  /* ── ORATEURS ── */
+  .orateurs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0.4rem 0; }
+  .orateur {
+    font-size: 0.75rem;
+    padding: 0.2em 0.6em;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* ── SCÉNARIO BASCULE ── */
+  .scenario {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.3rem 1rem;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .scenario:last-child { border-bottom: none; }
+  .scenario-rto { color: var(--green); font-weight: 700; font-family: monospace; text-align: right; white-space: nowrap; }
+
+  /* ── TOP BUTTON ── */
+  #top-btn {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+
+  #top-btn.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     STICKY HEADER
+═══════════════════════════════════════════════ -->
+<div id="header">
+  <div id="fil-rouge">
+    🎯 FIL ROUGE — <span>«&nbsp;On a tranché une ambiguïté par un <strong>postulat assumé</strong>&nbsp;»&nbsp;·&nbsp;JAMAIS "on n'a pas compris le sujet"</span>
+  </div>
+  <button id="nav-toggle" onclick="toggleNav()">☰ Navigation rapide ▾</button>
+  <div id="nav-menu">
+    <a href="#s0" onclick="closeNav()">0 · Le projet en 30 s</a>
+    <a href="#s1" onclick="closeNav()">1 · Chiffres-clés</a>
+    <a href="#s2" onclick="closeNav()">2 · Modèle de données</a>
+    <a href="#s3" onclick="closeNav()">3 · Architecture HA / PRA</a>
+    <a href="#s4" onclick="closeNav()">4 · Supervision</a>
+    <a href="#s5" onclick="closeNav()">5 · Sécurité</a>
+    <a href="#s6" onclick="closeNav()">6 · Exploitation</a>
+    <a href="#s7" onclick="closeNav()">7 · ⚠ Piège n°1</a>
+    <a href="#s8" onclick="closeNav()">8 · Pivot de cadrage</a>
+    <a href="#s9" onclick="closeNav()">9 · Choix techniques</a>
+    <a href="#s10" onclick="closeNav()">10 · V1 / V2</a>
+    <a href="#s11" onclick="closeNav()">11 · Répartition orateurs</a>
+    <a href="#s12" onclick="closeNav()">12 · Réflexes entretien</a>
+  </div>
+</div>
+
+<main>
+
+<!-- ══ 0. LE PROJET EN 30 SECONDES ══ -->
+<div class="section open" id="s0">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🚀</span> 0 · Le projet en 30 secondes</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-blue">
+      <div class="callout-title">À réciter</div>
+      NTL est une <strong>PME logistique</strong> (Hauts-de-France, siège Lille + 3 entrepôts). On a conçu et industrialisé la <strong>base de données de son WMS</strong> : modèle de données, haute dispo / PRA, sécurité, supervision, exploitation.<br><br>
+      Le sujet étant <strong>ambigu</strong> (grossiste ou 3PL ?), on a tranché par un <strong>postulat explicite — grossiste</strong> — et cadré la V1 dessus.<br><br>
+      Résultat : <strong>8 tables, 3NF, 0 trigger</strong>, une archi tenant <strong>RTO 1 h / RPO 15 min</strong>.
+    </div>
+  </div>
+</div>
+
+<!-- ══ 1. CHIFFRES-CLÉS ══ -->
+<div class="section" id="s1">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🔢</span> 1 · Chiffres-clés <span class="tag tag-orange">PAR CŒUR</span></div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Sujet</th><th>Valeur</th><th>Détail</th></tr></thead>
+        <tbody>
+          <tr><td><strong>RTO</strong></td><td><span class="val-key">1 h</span></td><td>Recovery Time Objective — délai max de reprise</td></tr>
+          <tr><td><strong>RPO</strong></td><td><span class="val-key">15 min</span></td><td>Recovery Point Objective — perte max</td></tr>
+          <tr><td>Fenêtre maintenance</td><td><span class="val-key">nuit</span></td><td>Activité 5h30 → 18h30 ouvré</td></tr>
+          <tr><td>Budget</td><td><span class="val-key">19h × 4</span></td><td>Justifie le périmètre resserré</td></tr>
+          <tr><td>Modèle</td><td><span class="val-key">8 tables</span></td><td>7 entités + 1 table associative <code>commande</code></td></tr>
+          <tr><td>Triggers / FK composites</td><td><span class="val-key">0 / 0</span></td><td>Intégrité : FK simples + CHECK + UNIQUE</td></tr>
+          <tr><td>Décisions tracées</td><td><span class="val-key">6 ADR</span></td><td>Sujet exige ≥ 3</td></tr>
+          <tr><td>SGBD</td><td><span class="val-key">MariaDB 11.4 LTS</span></td><td>LTS jusqu'en 2029</td></tr>
+          <tr><td>Serveurs BDD</td><td><span class="val-key">3</span></td><td>BDD1 Master, BDD2 Slave HA, BDD3 Slave PRA</td></tr>
+          <tr><td>Indicateurs supervision</td><td><span class="val-key">5</span></td><td>Latence, connexions, réplication, disque, sauvegardes</td></tr>
+          <tr><td>RTO réel estimé (HA)</td><td><span class="val-key">5–10 min</span></td><td>Tient largement dans la cible 1 h</td></tr>
+          <tr><td>RTO réel estimé (PRA)</td><td><span class="val-key">20–40 min</span></td><td>Tient largement dans la cible 1 h</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 2. MODÈLE DE DONNÉES ══ -->
+<div class="section" id="s2">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🗄️</span> 2 · Modèle de données</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="orateurs"><span class="orateur">Ianis</span><span class="orateur">Blaise</span></div>
+
+    <div class="callout callout-blue">
+      <strong>7 entités :</strong> <code>SITE</code> · <code>LOCALISATION</code> · <code>ARTICLE</code> · <code>CLIENT</code> · <code>STOCK</code> · <code>MOUVEMENT</code> · <code>UTILISATEUR</code><br>
+      <strong>+ 1 associative :</strong> <code>commande</code> (N-N entre CLIENT et ARTICLE)
+    </div>
+
+    <h3>Questions jury — réponses blindées</h3>
+
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Pourquoi STOCK est une entité ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        <code>stock</code> = <strong>1 article × 1 emplacement × 1 quantité</strong>. Entité réifiée porteuse de la quantité.<br><br>
+        <code>UNIQUE(id_article, id_localisation)</code> garantit une seule ligne par couple. 50 palettes du même article au même endroit = 1 ligne <code>quantite=50</code>, pas 50 lignes.
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Pourquoi <code>mouvement.id_client</code> est nullable ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        Issu de l'association <code>CONCERNE</code> (MOUVEMENT 0,1 — CLIENT 0,N).<br>
+        Mouvement <strong>interne</strong> (transfert, inventaire) → pas de client → <code>NULL</code>.<br>
+        Sortie vers un client → <code>id_client</code> renseigné.
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Les 4 types de mouvement ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        <code>CHECK (type IN ('entree','sortie','ajustement','transfert'))</code> + <code>quantite &gt; 0</code>.<br><br>
+        La <strong>quantité reste positive</strong>, le <strong>sens</strong> est porté par <code>type</code>. Un mouvement référence <strong>1 seul</strong> <code>id_stock</code>.
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Pourquoi <code>fournisseur</code> en attribut texte et pas une entité ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        La gestion achats/fournisseurs est portée par l'<strong>ERP commercial NTL</strong>, hors périmètre WMS V1.<br>
+        <code>article.fournisseur VARCHAR(100)</code> suffit à tracer l'origine.<br>
+        V2 → entité <code>FOURNISSEUR</code> si intégration WMS.
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Pourquoi des surrogate keys <code>id_*</code> partout ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        Standard industriel. <code>INT UNSIGNED</code> (4 octets) → FK légères, jointures rapides, <code>ALTER</code> simple si un code métier change.<br>
+        Les codes métier (<code>siret</code>, <code>code</code>, <code>reference</code>) sont conservés en <code>UNIQUE NOT NULL</code> pour la traçabilité externe.
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Pourquoi <code>ON DELETE RESTRICT</code> partout ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        On ne veut <strong>jamais</strong> détruire un historique de mouvements/stocks en supprimant un client, un article ou un site.<br>
+        Suppression métier = soft-delete applicatif. <code>RESTRICT</code> bloque toute suppression cassante au niveau moteur.
+      </div>
+    </div>
+
+    <h3>Technique — à retenir</h3>
+    <p>• <strong>InnoDB</strong> : seul moteur MariaDB transactionnel avec FK + ACID (MyISAM/Aria ne supportent pas les FK).</p>
+    <p>• <strong><code>utf8mb4</code></strong> : vrai UTF-8 (4 octets) ; <code>utf8</code> MariaDB = 3 octets seulement.</p>
+    <p>• <strong>3NF</strong> respectée. <strong>0 trigger</strong>, <strong>0 FK composite</strong>.</p>
+
+    <div class="callout callout-orange">
+      <div class="callout-title">⚠ Honnêteté obligatoire</div>
+      Le DDL n'a <strong>pas encore été exécuté</strong> sur une instance MariaDB 11.4. Plan de tests défini (4 CHECK, 10 FK, UNIQUE, RESTRICT).<br>
+      → dire : <em>"exécution = prochaine étape, notre 1ère perspective V2"</em>. Ne JAMAIS prétendre l'avoir testé.
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3. ARCHITECTURE HA / PRA ══ -->
+<div class="section" id="s3">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🏗️</span> 3 · Architecture HA / PRA</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="orateurs"><span class="orateur">Ojvind</span><span class="orateur">Zaid</span></div>
+
+    <div class="callout callout-blue" style="font-family: monospace; font-size: 0.82rem; line-height: 1.8;">
+      WMS-APP → HAProxy → BDD1 (Master) ──► BDD2 (Slave HA, local Lille)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──► BDD3 (Slave PRA, distant)
+    </div>
+
+    <p>• <strong>BDD1</strong> : reçoit toutes les écritures (production).</p>
+    <p>• <strong>BDD2</strong> : réplication locale → couvre panne service/VM du master.</p>
+    <p>• <strong>BDD3</strong> : réplication distante → couvre perte du site Lille.</p>
+    <p>• Réplication <strong>asynchrone</strong> + <strong>binlogs</strong> (faible impact master, simple à exploiter). RPO 15 min garanti par les binlogs (PITR).</p>
+
+    <h3>Scénarios de bascule</h3>
+    <div class="scenario"><span>Panne service MariaDB BDD1</span><span class="scenario-rto">5–10 min ✓</span></div>
+    <div class="scenario"><span>Perte VM BDD1</span><span class="scenario-rto">5–10 min ✓</span></div>
+    <div class="scenario"><span>Perte site Lille</span><span class="scenario-rto">20–40 min ✓</span></div>
+    <div class="scenario"><span>Corruption logique</span><span class="scenario-rto">selon volume</span></div>
+
+    <h3>Conditions avant bascule HA</h3>
+    <div class="callout callout-green">
+      Vérifier : <code>Slave_IO_Running=Yes</code> · <code>Slave_SQL_Running=Yes</code> · <code>Seconds_Behind_Master=0</code>
+    </div>
+
+    <h3>Sauvegardes</h3>
+    <p>• Complète quotidienne (<code>mariabackup</code>) + binlogs 48 h + configs MariaDB/HAProxy.</p>
+    <p>• Tests planifiés : bascule HA <strong>trimestrielle</strong> · bascule PRA <strong>semestrielle</strong> · restauration <strong>mensuelle</strong>.</p>
+  </div>
+</div>
+
+<!-- ══ 4. SUPERVISION ══ -->
+<div class="section" id="s4">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">📊</span> 4 · Supervision</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="orateurs"><span class="orateur">Ojvind</span></div>
+
+    <p style="margin-bottom:0.6rem;font-size:0.88rem;">Stack : <strong>Prometheus + Grafana</strong> · <code>mysqld_exporter</code> + <code>node_exporter</code> · Slow Query Log</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Indicateur</th><th>Normal</th><th style="color:var(--yellow)">Alerte</th><th style="color:var(--red)">Critique</th></tr></thead>
+        <tbody>
+          <tr><td>Latence SQL</td><td>&lt; 50 ms</td><td>&gt; 150 ms</td><td>&gt; 300 ms</td></tr>
+          <tr><td>Connexions actives</td><td>&lt; 50</td><td>&gt; 100</td><td>&gt; 150</td></tr>
+          <tr><td>Réplication (retard)</td><td>0–5 s</td><td>&gt; 15 s</td><td>&gt; 30 s</td></tr>
+          <tr><td>Espace disque libre</td><td>&gt; 20 %</td><td>&lt; 15 %</td><td>&lt; 10 %</td></tr>
+          <tr><td>Succès sauvegardes</td><td>100 %</td><td>1 échec</td><td>&gt; 1 échec</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-orange">
+      <strong>Lier les seuils à l'objectif :</strong><br>
+      • Réplication &gt; 30 s → <strong>RPO 15 min menacé</strong><br>
+      • Disque &lt; 10 % → <strong>arrêt MariaDB possible</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 5. SÉCURITÉ ══ -->
+<div class="section" id="s5">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🔒</span> 5 · Sécurité — Note CODIR</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="orateurs"><span class="orateur">Zaid</span></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Risque</th><th>Gravité</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Arrêt prolongé de la base (4 sites bloqués)</td><td><span class="tag tag-red">Critique</span></td></tr>
+          <tr><td>2</td><td>Vol d'un accès applicatif</td><td><span class="tag tag-red">Critique</span></td></tr>
+          <tr><td>3</td><td>Ransomware + sauvegardes inutilisables</td><td><span class="tag tag-red">Critique</span></td></tr>
+          <tr><td>4</td><td>Exfiltration des données clients</td><td><span class="tag tag-orange">Élevée</span></td></tr>
+          <tr><td>5</td><td>Perte de traçabilité réglementaire</td><td><span class="tag tag-orange">Élevée</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Plan d'action</h3>
+    <p><strong>P1 – immédiat (6 sem.) :</strong> sauvegardes externalisées <strong>3-2-1</strong> · restauration testée mensuellement · cluster HA · <strong>MFA admin</strong> · secrets en coffre.</p>
+    <p><strong>P2 – 3 mois :</strong> cloisonnement des accès (<strong>moindre privilège</strong>) · <strong>audit log inviolable</strong> 12 mois · runbook incident.</p>
+    <p><strong>P3 – 6 mois :</strong> exercice de crise · assurance cyber · sensibilisation.</p>
+
+    <div class="callout callout-blue">
+      <strong>RGPD :</strong> notification sous <strong>72 h</strong> en cas de fuite. Impacts qualitatifs (BIA non chiffrée → assumé, pas un manque).
+    </div>
+  </div>
+</div>
+
+<!-- ══ 6. EXPLOITATION ══ -->
+<div class="section" id="s6">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">📋</span> 6 · Exploitation — RunBook & Logs</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="orateurs"><span class="orateur">Zaid</span></div>
+
+    <p><strong>RunBook :</strong> Start/Stop, health checks, checklists quotidienne/hebdo, gestion incidents, <strong>matrice d'escalade N1→N4</strong> (15 min → 2 h), KPI.</p>
+
+    <h3>5 sources de logs</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Source</th><th>Patterns critiques</th></tr></thead>
+        <tbody>
+          <tr><td><code>error.log</code></td><td>InnoDB corruption</td></tr>
+          <tr><td><code>slow.log</code></td><td>Requêtes lentes</td></tr>
+          <tr><td>Binlogs</td><td>PITR, réplication</td></tr>
+          <tr><td>HAProxy</td><td>Backend DOWN</td></tr>
+          <tr><td>Sauvegardes</td><td>Backup failed</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--muted)">Chaque pattern cartographié avec gravité + action → <code>Slave_IO=No</code>, <code>Too many connections</code>, etc.</p>
+  </div>
+</div>
+
+<!-- ══ 7. PIÈGE N°1 ══ -->
+<div class="section" id="s7">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">⚠️</span> 7 · PIÈGE N°1 <span class="tag tag-red">ATTENDU</span></div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-red">
+      <div class="callout-title">Question jury</div>
+      «&nbsp;Le sujet demande la séparation des données par client, je ne la vois pas comme une isolation forte dans votre schéma.&nbsp;»
+    </div>
+
+    <div class="callout callout-green">
+      <div class="callout-title">Réponse (à mémoriser)</div>
+      «&nbsp;Sous notre postulat <strong>grossiste</strong> (stock propre NTL), la séparation pertinente est l'<strong>attribution</strong> — présente via <code>mouvement.id_client</code> et la table <code>commande</code> : on sait parfaitement qui a commandé/reçu quoi.<br><br>
+      L'<strong>isolation multi-tenant</strong> (un client ne voit jamais les données d'un autre) ne se justifie qu'en modèle <strong>3PL</strong>, qu'on a explicitement réservé à une V2. C'est un arbitrage <strong>tracé (ADR 0003)</strong>, pas un manque.&nbsp;»
+    </div>
+
+    <p style="font-size:0.85rem; color:var(--muted)">→ Rester calme. C'est la question attendue.</p>
+  </div>
+</div>
+
+<!-- ══ 8. PIVOT DE CADRAGE ══ -->
+<div class="section" id="s8">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🔄</span> 8 · Pivot de cadrage</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="orateurs"><span class="orateur">Ianis</span></div>
+
+    <p><strong>Problème :</strong> sujet ambigu → «&nbsp;PME logistique&nbsp;» + «&nbsp;séparation par client&nbsp;» se lit grossiste <em>ou</em> 3PL.</p>
+    <p><strong>Solution :</strong> postulat explicite <strong>grossiste</strong> (ADR 0003, 22/05). Démarche d'<strong>itération maîtrisée</strong>, pas du tâtonnement.</p>
+
+    <h3>Conséquences de ce pivot</h3>
+    <p>Décisions D02/D03/D04 → <strong>SUPERSEDED</strong> par D13 :</p>
+    <ul style="margin:0.5rem 0 0.5rem 1.2rem; font-size:0.88rem; line-height:1.8;">
+      <li>Multi-tenant (FK composite) <strong>retiré</strong> → reporté V2 si bascule 3PL</li>
+      <li>Triggers <strong>supprimés</strong> → <strong>0 trigger</strong></li>
+      <li>FOURNISSEUR <strong>dé-entifié</strong> (attribut texte) + table <code>commande</code> ajoutée → <strong>8 tables</strong></li>
+    </ul>
+
+    <div class="callout callout-blue">
+      À raconter comme une <strong>démonstration de maturité</strong> : on a détecté l'ambiguïté, posé un postulat, tracé la décision, livré un MVP cohérent.
+    </div>
+  </div>
+</div>
+
+<!-- ══ 9. CHOIX TECHNIQUES ══ -->
+<div class="section" id="s9">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">⚙️</span> 9 · Choix techniques</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Pourquoi MariaDB et pas MySQL ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        <strong>Argument n°1 :</strong> drop-in replacement de MySQL → migration quasi nulle, équipe IT pas reformée.<br><br>
+        En plus : LTS jusqu'en 2029, indépendance Oracle (Fondation MariaDB), Galera natif pour une évolution HA synchrone.<br><br>
+        <span style="color:var(--red)">⚠ Ne PAS dire «&nbsp;MariaDB est mieux&nbsp;».</span> Dire : «&nbsp;<strong>meilleur compromis dans CE contexte</strong>&nbsp;».
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Pourquoi pas PostgreSQL ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        Postgres imposerait de <strong>réécrire le WMS-APP</strong> (driver, dialecte, types) — hors sujet.<br>
+        L'équipe IT NTL n'a aucune compétence Postgres.<br>
+        → Mauvais compromis dans ce contexte spécifique, même si Postgres est excellent par ailleurs.
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q" onclick="toggleQA(this)">Pourquoi réplication asynchrone et pas synchrone (Galera) ? <span class="qa-chevron">▼</span></div>
+      <div class="qa-a">
+        Faible impact master + <strong>simplicité</strong> (équipe IT réduite, pas de spécialiste cluster).<br>
+        Galera synchrone = évolution V2 si les besoins RPO évoluent. C'est un arbitrage assumé.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 10. V1 / V2 ══ -->
+<div class="section" id="s10">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🗺️</span> 10 · Périmètre V1 / Perspectives V2</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-blue">
+      Cadrer la V1 comme un <strong>MVP</strong>, pas un «&nbsp;brouillon&nbsp;». Tout ce qui est hors V1 est <strong>assumé et tracé</strong>.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Hors V1</th><th>Pourquoi</th><th>V2</th></tr></thead>
+        <tbody>
+          <tr><td>Multi-tenant (isolation)</td><td>Postulat grossiste</td><td>FK composite si bascule 3PL</td></tr>
+          <tr><td>Lots / DLC / FEFO</td><td>Cœur WMS d'abord</td><td>V2</td></tr>
+          <tr><td>Expéditions / transporteurs</td><td>Hors cœur entreposage</td><td>V2</td></tr>
+          <tr><td>Gestion fournisseurs</td><td>Portée par l'ERP commercial</td><td>V2 si intégration</td></tr>
+          <tr><td>Prix / facturation</td><td>Hors périmètre BDD WMS</td><td>ERP</td></tr>
+          <tr><td><strong>Exécution du DDL</strong></td><td>Manque de temps</td><td><strong>1ère perspective</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 11. RÉPARTITION ORATEURS ══ -->
+<div class="section" id="s11">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🎤</span> 11 · Répartition orateurs</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Slides</th><th>Sujet</th><th>Orateur(s)</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td>Titre, contexte, démarche</td><td><span class="tag tag-blue">Ianis</span></td></tr>
+          <tr><td>4–6</td><td>Modèle de données (MCD, choix, intégrité)</td><td><span class="tag tag-blue">Ianis</span> <span class="tag tag-purple">Blaise</span></td></tr>
+          <tr><td>7–8</td><td>Architecture HA / PRA</td><td><span class="tag tag-green">Ojvind</span> <span class="tag tag-orange">Zaid</span></td></tr>
+          <tr><td>9</td><td>Sécurité (note CODIR)</td><td><span class="tag tag-orange">Zaid</span></td></tr>
+          <tr><td>10</td><td>Supervision</td><td><span class="tag tag-green">Ojvind</span></td></tr>
+          <tr><td>11</td><td>RunBook & logs</td><td><span class="tag tag-orange">Zaid</span></td></tr>
+          <tr><td>12</td><td>Pivot de cadrage (difficulté)</td><td><span class="tag tag-blue">Ianis</span></td></tr>
+          <tr><td>13</td><td>Résultats & perspectives</td><td><span class="tag tag-purple">Blaise</span></td></tr>
+          <tr><td>14</td><td>Conclusion + questions</td><td><em style="color:var(--muted)">équipe</em></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 12. RÉFLEXES ENTRETIEN ══ -->
+<div class="section" id="s12">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-title"><span class="section-icon">🧠</span> 12 · Réflexes — entretien 30 min</div>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-green">
+      <strong>Honnêteté &gt; bluff</strong> : DDL non exécuté, BIA non chiffrée, impacts qualitatifs → tout est <strong>assumé et tracé</strong>.
+    </div>
+
+    <p>• Toute limite = <strong>arbitrage tracé</strong> (renvoyer à l'ADR), jamais un oubli.</p>
+    <p>• «&nbsp;On n'a pas compris le sujet&nbsp;» → interdit. Dire «&nbsp;on a tranché une ambiguïté par un postulat assumé&nbsp;».</p>
+    <p>• Rester calme sur le piège isolation/multi-tenant (<a href="#s7" style="color:var(--blue)">§7</a>) — c'est LA question attendue.</p>
+
+    <div class="callout callout-orange">
+      <div class="callout-title">Format 20 + 30</div>
+      <strong>20 min</strong> : oral collectif (présentation)<br>
+      <strong>30 min</strong> : entretien jury (2 évaluateurs) — questions individuelles possibles
+    </div>
+  </div>
+</div>
+
+</main>
+
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  function toggleSection(header) {
+    header.parentElement.classList.toggle('open');
+  }
+
+  function toggleQA(qEl) {
+    qEl.parentElement.classList.toggle('open');
+  }
+
+  function toggleNav() {
+    document.getElementById('nav-menu').classList.toggle('open');
+  }
+
+  function closeNav() {
+    document.getElementById('nav-menu').classList.remove('open');
+  }
+
+  // Top button visibility
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('top-btn');
+    btn.classList.toggle('visible', window.scrollY > 300);
+  });
+
+  // Close nav when clicking outside
+  document.addEventListener('click', (e) => {
+    const nav = document.getElementById('nav-menu');
+    const toggle = document.getElementById('nav-toggle');
+    if (!nav.contains(e.target) && e.target !== toggle) {
+      nav.classList.remove('open');
+    }
+  });
+</script>
+</body>
+</html>

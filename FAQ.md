@@ -1,82 +1,76 @@
-# FAQ Soutenance — MCD / MLD WMS-DB
+# FAQ Soutenance — modèle de données WMS (V2 grossiste)
 
-> Réponses prêtes à défendre, droit au but. Si tu vas plus loin que la réponse écrite ici, tu improvises au-delà du périmètre tranché — risqué.
+> Réponses prêtes à défendre, alignées sur le modèle **réellement rendu** : MCD/MLD/DDL V2 grossiste (8 tables, 0 trigger, 0 FK composite).
+> ⚠️ Cette FAQ remplace une version antérieure qui décrivait un modèle multi-tenant V4 **abandonné**. Ne défends que ce qui est ci-dessous — c'est ce qui est dans le `wms-schema.sql`.
 
-## MCD — choix structurants
+## Le modèle en une phrase
 
-### Pourquoi 8 entités et pas le modèle complet à 14 ?
-V1 = cœur WMS défendable en soutenance. Lots/DLC/FEFO, commandes, expéditions, transporteurs reportés en évolution V2 fonctionnelle. C'est un choix de périmètre assumé, pas un oubli. → `01-architecture-technique/mcd/wms-mcd.md` §7
+NTL est un **grossiste** : 8 tables (`site`, `localisation`, `utilisateur`, `client`, `article`, `stock`, `mouvement`, `commande`), intégrité par **FK simples + CHECK + UNIQUE**, surrogate keys `id_*`, moteur InnoDB, `utf8mb4`. Aucun trigger. Cf. [`decisions/0003-postulats-cadrage-ntl.md`](decisions/0003-postulats-cadrage-ntl.md).
 
-### Pourquoi STOCK est une entité et pas une association ?
-STOCK est une **entité réifiée dépendante** du couple (ARTICLE, EMPLACEMENT). On l'a sorti d'une ternaire `stockage(ARTICLE, STOCK, EMPLACEMENT)` parce qu'avec STOCK en cardinalité (1,1), la ternaire était décomposable en 2 binaires (règle Merise). Lecture du diagramme plus naturelle, MLD identique. → `01-architecture-technique/mcd/arbitrages-v4-ianis.md` point 1
+## Cadrage métier
 
-### Pourquoi FOURNISSEUR est extrait d'ARTICLE et pas juste un attribut texte ?
-Un attribut `fournisseur` violerait la 3NF (redondance, typos, impossible d'enrichir). L'extraction en entité garantit l'intégrité référentielle via FK et permet d'ajouter des attributs en V2 (contact, contrat) sans refonte. Coût : +1 entité, +1 association. → `01-architecture-technique/mcd/arbitrages-v4-ianis.md` point 4
+### Pourquoi avoir modélisé NTL en grossiste et pas en 3PL ?
+Le sujet est **ambigu** : « PME de logistique » + « séparation des données par client » peut se lire grossiste (stock propre) **ou** 3PL (stock des clients). Plutôt que de deviner, on a posé un **postulat explicite** — grossiste — et cadré la V1 dessus. C'est tracé dans [ADR 0003](decisions/0003-postulats-cadrage-ntl.md). → ne **jamais** dire « on n'a pas compris le sujet » : dire « on a tranché une ambiguïté par un postulat assumé ».
 
-### Pourquoi `realise_pour CLIENT-MOUVEMENT` alors qu'on peut dériver le client via l'ARTICLE ?
-La séparation multi-tenant est **l'exigence centrale** du sujet NTL. Sans cette association, la garantie n'est visible qu'au MLD. Le cycle CLIENT-ARTICLE-MOUVEMENT-CLIENT n'est pas une redondance fautive, c'est une **contrainte d'intégrité explicite** verrouillée au DDL par la FK composite option D. → `01-architecture-technique/mcd/arbitrages-v4-ianis.md` point 3
+### Le sujet exige « séparation des données par client ». Où est-elle ?
+Par **attribution** : chaque `commande` et chaque `mouvement` de sortie porte un `id_client`. On sait parfaitement *qui a commandé / reçu quoi*. L'**isolation forte** (un client ne voit jamais les données d'un autre) n'a de sens qu'en **3PL** ; sous le postulat grossiste, NTL possède son stock, donc l'attribution suffit. L'isolation multi-tenant est une **évolution V2** si NTL bascule vers le 3PL.
 
-### Pourquoi `id_site` est dénormalisé sur `mouvements` ?
-Pour garantir **déclarativement** la règle TRANSFERT intra-site sans trigger. La FK composite `(id_depart, id_site) → emplacements(id_emplacement, id_site)` empêche au niveau du moteur InnoDB de référencer un emplacement d'un autre site. → `01-architecture-technique/mcd/wms-mcd.md` §4 + `01-architecture-technique/mld/wms-mld.md` §5
+### Pourquoi 8 tables et pas un modèle plus complet ?
+Périmètre V1 **volontairement resserré sur le cœur métier** (entreposage : sites, emplacements, articles, stock, mouvements, clients, commandes), conçu pour évoluer. Lots/DLC/FEFO, expéditions, transporteurs = couche fonctionnelle V2 assumée, pas un oubli. → cadre ça comme un **MVP**, pas un « brouillon ».
 
-### Pourquoi pas d'association directe SITE-MOUVEMENT au MCD ?
-Pour ne pas polluer le diagramme avec une redondance conceptuelle (le site est dérivable via EMPLACEMENT). La dénormalisation est une décision MLD/DDL, pas conceptuelle.
+## MCD / MLD — choix structurants
 
-### C'est quoi le XOR sur AJUSTEMENT et pourquoi c'est pas dans le MCD ?
-AJUSTEMENT cible exactement un emplacement (départ XOR arrivée). Cette contrainte conditionnelle par valeur n'est pas exprimable en Merise classique. Reportée au DDL via `CHECK ck_mvt_src_dst`. Limitation reconnue du formalisme. → `01-architecture-technique/mcd/arbitrages-v4-ianis.md` point 5
+### Pourquoi STOCK est une entité/table et pas une simple association ?
+Un `stock` = **1 article × 1 emplacement × 1 quantité**. C'est une entité réifiée porteuse de la quantité. La contrainte `UNIQUE (id_article, id_localisation)` garantit qu'il n'y a **qu'une ligne** de stock par couple article/emplacement (50 palettes du même article au même endroit = 1 ligne `quantite=50`, pas 50 lignes).
 
-## MLD — choix d'implémentation
+### Pourquoi `mouvement.id_client` est nullable ?
+Issu de l'association `CONCERNE` (MOUVEMENT 0,1 — CLIENT 0,N). Un mouvement **interne** (transfert intra-entrepôt, ajustement d'inventaire) n'a **pas de client** → NULL. Une sortie vers un client porte son `id_client`.
 
-### C'est quoi « l'option D » ?
-C'est la solution retenue pour garantir au MLD/DDL qu'un stock ou un mouvement ne peut pas associer un article avec un autre client que son propriétaire. Concrètement : FK composite `(id_article, id_client)` depuis `stocks` et `mouvements` vers `articles(id_article, id_client)`. Vérifié déclarativement par InnoDB, pas de trigger. → `01-architecture-technique/mld/wms-mld.md` §5
+### Comment gérez-vous les 4 types de mouvement (entrée/sortie/ajustement/transfert) ?
+Par l'attribut `mouvement.type` contraint par `CHECK (type IN ('entree','sortie','ajustement','transfert'))`, plus `quantite > 0` (le **sens** est porté par `type`, la quantité reste toujours positive). Un mouvement référence **un seul** `id_stock` (la ligne de stock impactée). → modèle simple, pas de colonnes départ/arrivée.
 
-### Pourquoi des surrogate `id_*` partout au MLD et pas les codes métier en PK ?
-Standard industriel. INT UNSIGNED = 4 octets, FK plus légères, jointures plus rapides, ALTER plus simple si un code métier change. Le code métier MCD (`CODE_CLIENT`, `LOGIN`, etc.) est conservé en `UNIQUE NOT NULL` pour traçabilité externe. → `01-architecture-technique/mld/wms-mld.md` §1 règle 2
+### Pourquoi `fournisseur` est un attribut texte et pas une entité ?
+Choix de **périmètre** : la gestion achats/fournisseurs (contrats, contacts, références) est portée par l'**ERP commercial NTL**, hors périmètre WMS V1. En V1, `article.fournisseur VARCHAR(100)` suffit à tracer l'origine. Si la gestion fournisseur entre dans le WMS en V2 → extraction en entité `FOURNISSEUR` (intégrité référentielle, 3NF). On assume le compromis.
 
-### Pourquoi ENUM et pas une table de référence ?
-ENUM = compact, contrôlé par le moteur, équivalent fonctionnel à `CHECK IN (...)`. Pour les 4 domaines V1 (statut client, rôle utilisateur, type emplacement, type mouvement), les valeurs sont stables. Si une nouvelle valeur arrive, `ALTER TABLE` (verrou court). Si on prouve une volatilité forte → bascule vers table de référence en V2. → `01-architecture-technique/mld/wms-mld.md` §6.2 + §9
+### Pourquoi des surrogate keys `id_*` partout ?
+Standard industriel. `INT UNSIGNED` = 4 octets, FK légères, jointures rapides, `ALTER` simple si un code métier change. Les codes métier (`siret`, `code` localisation, `reference` mouvement) sont conservés en `UNIQUE NOT NULL` pour la traçabilité externe.
 
-### Pourquoi pas de trigger pour TRANSFERT intra-site ?
-Triggers = magie cachée, difficiles à auditer, alourdissent la maintenance. La FK composite `(id_depart, id_site)` + `(id_arrivee, id_site)` vers `emplacements(id_emplacement, id_site)` donne la même garantie déclarativement, vérifiée par le moteur. C'est plus propre et plus lisible. → `01-architecture-technique/mld/wms-mld.md` §5
+### Pourquoi `ON DELETE RESTRICT` partout ?
+On ne veut **jamais** détruire un historique de mouvements/stocks en supprimant un client, un article ou un site. Une suppression métier passe par un statut applicatif (soft-delete). `RESTRICT` bloque toute suppression cassante au niveau moteur.
 
-### Mais il y a 2 triggers sur `mouvements`, pourquoi ?
-Forcés par un **bug du parser MariaDB 11.4** identifié au moment de l'exécution du DDL : tout `CHECK` qui référence `id_depart` ou `id_arrivee` sur la table `mouvements` est rejeté avec `ERROR 1901` à cause de l'interaction avec les FK composites. Les FK composites étant prioritaires (verrouillent l'isolation TRANSFERT intra-site, décision V4 verrouillée), on a porté la règle XOR `ck_mvt_src_dst` via 2 triggers `BEFORE INSERT / BEFORE UPDATE` avec `SIGNAL SQLSTATE '45000'`. Sémantique identique au CHECK initial. → `01-architecture-technique/ddl/wms-ddl.md` §5.bis
-
-### Pourquoi `ON DELETE RESTRICT` partout au lieu de CASCADE ?
-Parce qu'on ne veut **jamais** détruire un historique de mouvements en supprimant un client ou un article. Une suppression métier passe par soft-delete applicatif (statut, archivage). Exception : `articles.id_fournisseur` en `SET NULL` (un fournisseur supprimé ne doit pas bloquer un article). → `01-architecture-technique/mld/wms-mld.md` §4
-
-### Pourquoi `UNIQUE(id_article, id_emplacement)` sur `stocks` ?
-Règle métier non négociable : une seule ligne de stock courant par couple article/emplacement. Si on a 50 palettes du même article au même emplacement, c'est UNE ligne avec `quantite = 50`, pas 50 lignes. → `01-architecture-technique/mld/wms-mld.md` §3
-
-## Périmètre et limites
-
-### Pourquoi pas de lots / DLC / FEFO ?
-Hors périmètre V1 assumé. Sujet : « cœur WMS défendable ». Lots = +1 entité minimum, refonte du STOCK (par lot), refonte des MOUVEMENTS (par lot), tracking DLC. Évolution V2. → `01-architecture-technique/mcd/wms-mcd.md` §7
-
-### Pourquoi pas de soft-delete (`deleted_at`) en V1 ?
-Pas d'exigence dans le sujet, alourdit toutes les requêtes (filtre `WHERE deleted_at IS NULL` partout ou vues). Reporté V2 si besoin. La politique `ON DELETE RESTRICT` empêche de toute façon les suppressions cassantes. → `01-architecture-technique/mld/wms-mld.md` §9
-
-### C'est quoi la différence multi-tenant logique vs physique ?
-- **Logique (V1)** : un seul schéma, isolation par FK composite et filtres `WHERE id_client = ?` dans l'application.
-- **Physique (V2 si exigé)** : un schéma par client, isolation au niveau base. Plus sécurisé, mais coût opérationnel × N clients (sauvegardes, migrations, monitoring).
-→ `01-architecture-technique/mld/wms-mld.md` §9
+### Pourquoi une table `commande` séparée ?
+Association N-N entre CLIENT et ARTICLE (un client commande plusieurs articles, un article est commandé par plusieurs clients), avec attributs propres `quantite_commandee` et `date_commande`. Règle de passage MCD→MLD classique : association N-N → table associative.
 
 ## Technique
 
-### Pourquoi MariaDB 11.4 et pas PostgreSQL / MySQL ?
-- **LTS** : MariaDB 11.4 LTS = support jusqu'à 2029, stable pour production
-- **Galera** : support HA cluster multi-maître natif (critère RTO/RPO)
-- **Licence GPLv2** : pas d'incertitude juridique comme MySQL (Oracle)
-- **Compatibilité** : drop-in MySQL si migration future
-- Justification détaillée à formaliser dans le livrable « Justification SGBD » (cf. [`EQUIPE.md`](EQUIPE.md))
+### Pourquoi MariaDB 11.4 et pas MySQL / PostgreSQL ?
+- **Drop-in replacement de MySQL** : NTL est déjà sous MySQL → migration quasi nulle, équipe IT pas reformée. (Argument n°1.)
+- **LTS jusqu'en 2029**, **indépendance Oracle** (Fondation MariaDB).
+- **Galera disponible nativement** : argument HA fort pour l'évolution vers une vraie haute dispo synchrone.
+- **PostgreSQL écarté** : imposerait de réécrire le WMS-APP (driver, dialecte, types) — hors sujet — et l'équipe IT NTL n'a aucune compétence Postgres.
+- → ne **pas** dire « MariaDB est mieux que MySQL ». Dire « meilleur compromis **dans ce contexte** ». Détail : [`decisions/0002-sgbd-mariadb.md`](decisions/0002-sgbd-mariadb.md).
 
-### Pourquoi InnoDB et pas un autre moteur ?
-Seul moteur transactionnel MariaDB qui supporte FK + ACID + Galera. Aria et MyISAM ne supportent pas les FK. Pas de débat. → `01-architecture-technique/mld/wms-mld.md` §1 règle 10
+### Pourquoi InnoDB ?
+Seul moteur MariaDB transactionnel avec **FK + ACID**. MyISAM/Aria ne supportent pas les FK. Pas de débat.
 
 ### Pourquoi `utf8mb4` et pas `utf8` ?
-`utf8` MySQL/MariaDB historique = max 3 octets par caractère, ne couvre pas tout l'Unicode (notamment emoji, certains idéogrammes). `utf8mb4` = 4 octets max, vrai UTF-8. Standard depuis ~2015. → `01-architecture-technique/mld/wms-mld.md` §1 règle 9
+`utf8` MariaDB = 3 octets max, ne couvre pas tout l'Unicode. `utf8mb4` = vrai UTF-8 (4 octets), standard depuis ~2015.
 
-### Comment on garantit RTO 1h / RPO 15 min ?
-- **RPO 15 min** : sauvegardes incrémentales `mariabackup` toutes les 15 min, ou réplication synchrone Galera (RPO ≈ 0 entre nœuds)
-- **RTO 1h** : failover automatique Galera (basculement < 5 min) + procédure de restauration documentée dans le RunBook
-- Détail à formaliser dans le livrable HA/PRA
+### Le DDL a-t-il été testé ?
+**Honnêteté** : le script V2 n'a **pas encore** été exécuté sur une instance MariaDB 11.4 (cf. `01-architecture-technique/ddl/wms-ddl.md` §8). Le plan de tests est défini (4 CHECK, 10 FK, contrainte UNIQUE, ON DELETE RESTRICT). Si on te demande : ne prétends pas l'avoir testé.
+
+## Périmètre et limites (à assumer)
+
+| Hors V1 | Pourquoi | Évolution |
+|---|---|---|
+| Multi-tenant (isolation) | Postulat grossiste = stock propre | V2 si bascule 3PL → FK composite `(id_article, id_client)` |
+| Lots / DLC / FEFO | Cœur WMS d'abord | V2 |
+| Expéditions / transporteurs | Hors cœur entreposage | V2 |
+| Gestion fournisseurs | Portée par l'ERP commercial | V2 si intégration WMS |
+| Prix / facturation | Hors périmètre BDD WMS | ERP |
+
+## Le piège n°1 à connaître
+
+> « Le sujet demande la séparation des données par client, je ne la vois pas comme une isolation forte dans votre schéma. »
+
+**Réponse** : « Sous notre postulat grossiste (stock propre NTL), la séparation pertinente est l'**attribution** — présente via `mouvement.id_client` et `commande`. L'isolation multi-tenant ne se justifie qu'en modèle 3PL, qu'on a explicitement réservé à une V2. C'est un arbitrage tracé ([ADR 0003](decisions/0003-postulats-cadrage-ntl.md)), pas un manque. »

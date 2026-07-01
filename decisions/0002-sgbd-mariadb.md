@@ -24,7 +24,7 @@ Le sujet MSPR3 (§II.3) exige de **justifier explicitement** le SGBD retenu pour
 - **Existant** : MySQL en place chez NTL → migration ou continuité à arbitrer.
 - **Équipe IT NTL** : 1 RSI + 1 admin sys itinérant + 1 tech + 1 alternant. **Pas de DBA**.
 - **RTO 1h / RPO 15 min** → besoin d'une HA mûre et de hot backups physiques rapides.
-- **Multi-tenant** déjà acté (séparation par client, FK composite — cf. D02).
+- **Séparation par client** exigée (§II.1) — assurée par attribution (`mouvement.id_client`, table `commande`) sous le postulat grossiste, cf. [ADR 0003](0003-postulats-cadrage-ntl.md).
 - **Budget projet** : 19h × 4 personnes. Aucune marge pour reformer l'équipe NTL sur une stack inconnue.
 - **Jury** : un examinateur regardera "pourquoi ce SGBD et pas un autre" — il faut un argumentaire chiffré et opposable.
 
