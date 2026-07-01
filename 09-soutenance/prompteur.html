@@ -193,55 +193,49 @@ const slides = [
     ]
   },
   {
-    num: 5, title: "Optimisation & performance", orateur: "Blaise", time: "1:00",
-    ecran: "Démarche par usages, requêtes types, index, choix physiques.",
-    dire: "Sur les performances, on est parti des usages réels plutôt que d'indexer au hasard. Les requêtes les plus fréquentes, ce sont le stock d'un article ou d'un site, les mouvements sur une période, et la recherche d'un article. On a donc posé des index ciblés là-dessus — notamment sur le couple site-article et sur la date des mouvements. Et on a choisi des types légers, des entiers non signés pour les clés étrangères, ce qui garde les jointures rapides. Bref : on optimise là où ça sert, en fonction de comment la base va vraiment être interrogée.",
-    pieges: []
-  },
-  {
-    num: 6, title: "Choix du SGBD", orateur: "Ojvind", time: "1:00",
+    num: 5, title: "Choix du SGBD", orateur: "Ojvind", time: "1:00",
     ecran: "MariaDB 11.4 LTS, l'argument de continuité, PostgreSQL écarté.",
     dire: "Pour le SGBD, on a retenu MariaDB 11.4 LTS, supportée jusqu'en 2029. L'argument numéro un, c'est la continuité : l'existant tourne déjà sous MySQL, et MariaDB en est un remplaçant direct. La migration est donc quasi nulle, et l'équipe IT n'a pas besoin d'être reformée. On a regardé PostgreSQL, mais il aurait fallu réécrire une partie de l'application — le pilote, le dialecte SQL, les types — et l'équipe n'a pas cette compétence. Notre position, ce n'est pas de dire « MariaDB est meilleur dans l'absolu » : c'est « c'est le meilleur compromis dans ce contexte précis ».",
     pieges: []
   },
   {
-    num: 7, title: "Architecture Haute Disponibilité", orateur: "Ojvind", time: "1:30",
+    num: 6, title: "Architecture Haute Disponibilité", orateur: "Ojvind", time: "1:30",
     ecran: "Schéma : WMS-APP → HAProxy → Master → 2 réplicas (HA local + PRA distant).",
     dire: "Voici l'architecture de haute disponibilité. L'application passe par HAProxy, qui l'aiguille vers le serveur maître — celui qui reçoit toutes les écritures. Ce maître réplique en continu vers deux serveurs. Le premier est un réplica local : il couvre une panne de service ou de machine sur le site. Le second est un réplica distant : il couvre la perte complète du site de Lille. La réplication est asynchrone, avec les journaux binaires : c'est simple à exploiter et ça pèse peu sur le maître, ce qui est adapté à une petite équipe. La réplication synchrone, de type Galera, on la garde comme évolution possible en V2.",
     pieges: []
   },
   {
-    num: 8, title: "PRA, sauvegardes & restauration", orateur: "Zaid", time: "2:00",
+    num: 7, title: "PRA, sauvegardes & restauration", orateur: "Zaid", time: "2:00",
     ecran: "Scénarios de bascule + RTO, RPO via binlogs, scripts de sauvegarde, tests.",
     dire: "La continuité, c'est le cœur du sujet : on nous demande un temps de reprise d'une heure et une perte de données maximale de quinze minutes. On les tient, avec de la marge. Une panne de service ou de machine, c'est une bascule HAProxy en cinq à dix minutes. La perte du site, c'est le passage sur le réplica distant en vingt à quarante minutes — donc bien sous l'heure. Les quinze minutes de perte maximale sont garanties par les journaux binaires. Côté sauvegardes, tout est automatisé et scripté : une sauvegarde complète chaque nuit avec mariabackup, l'archivage transactionnel en continu, la rotation et la rétention, la vérification, et la notification en cas d'échec. Et surtout, on planifie les tests de restauration — parce qu'une sauvegarde qu'on n'a jamais restaurée, ce n'est pas une sauvegarde.",
     pieges: ["Sauvegarde incrémentale ? → l'archivage des journaux binaires joue ce rôle : il capture chaque transaction entre deux complètes, ce qui donne le RPO de quinze minutes."]
   },
   {
-    num: 9, title: "Sécurité des accès", orateur: "Zaid", time: "1:00",
+    num: 8, title: "Sécurité des accès", orateur: "Zaid", time: "1:00",
     ecran: "Moindre privilège, comptes séparés, MFA, secrets.",
     dire: "Sur les accès, on applique le principe de moindre privilège. L'application se connecte avec un compte qui a uniquement le strict nécessaire sur les tables métier — jamais un compte administrateur. L'administration passe par un compte séparé, protégé par une double authentification. Les secrets sont dans un coffre, jamais en clair dans un fichier de configuration. Et les comptes sont nominatifs, pour qu'on puisse tracer qui fait quoi.",
     pieges: []
   },
   {
-    num: 10, title: "Note Comité de direction (risques cyber)", orateur: "Zaid", time: "1:30",
+    num: 9, title: "Note Comité de direction (risques cyber)", orateur: "Zaid", time: "1:30",
     ecran: "5 risques en langage direction, plan priorisé, RGPD.",
     dire: "Le sujet demandait une note destinée au comité de direction — donc un langage non technique, orienté métier. On a identifié cinq risques cyber majeurs : l'arrêt prolongé de la base, le vol d'un accès, un ransomware qui rendrait les sauvegardes inutilisables, l'exfiltration des données clients, et la perte de traçabilité réglementaire. Pour chacun, on parle impact business, pas jargon. Et on propose un plan d'action priorisé en trois vagues : l'immédiat sur six semaines, puis à trois mois, puis à six mois. On rappelle aussi l'obligation RGPD de notifier une fuite sous soixante-douze heures. L'idée, c'est de faire adhérer la direction en parlant son langage.",
     pieges: []
   },
   {
-    num: 11, title: "Supervision", orateur: "Ojvind", time: "1:30",
+    num: 10, title: "Supervision", orateur: "Ojvind", time: "1:30",
     ecran: "Stack Prometheus/Grafana, 5 indicateurs + seuils reliés à un objectif.",
     dire: "Pour la supervision, on propose un tableau de bord de cinq indicateurs critiques, sous Prometheus et Grafana. Ces cinq indicateurs : la latence des requêtes, le nombre de connexions actives, le retard de réplication, l'espace disque libre, et le succès des sauvegardes. Le point important, c'est qu'on ne surveille pas pour surveiller : chaque seuil est relié à un objectif concret. Par exemple, si le retard de réplication dépasse trente secondes, c'est notre RPO de quinze minutes qui est menacé. Si le disque descend sous dix pour cent, MariaDB peut s'arrêter. Et chaque alerte a sa procédure d'analyse associée.",
     pieges: []
   },
   {
-    num: 12, title: "Exploitation : RunBook & analyse de logs", orateur: "Zaid", time: "1:30",
+    num: 11, title: "Exploitation : RunBook & analyse de logs", orateur: "Zaid", time: "1:30",
     ecran: "RunBook (start/stop, checklists, incident, escalade), 5 sources de logs.",
     dire: "L'exploitation au quotidien, c'est le RunBook. Il couvre le démarrage et l'arrêt, les contrôles de santé, les checklists quotidiennes et hebdomadaires, la procédure d'incident de bout en bout — de la détection au retour à la normale — et une matrice d'escalade du niveau 1 au niveau 4, avec des délais cibles. Sur les logs, on a identifié cinq sources : les erreurs, les requêtes lentes, les journaux binaires, HAProxy et les sauvegardes. Et pour chacune, on a cartographié les patterns critiques et la façon de les corréler, pour diagnostiquer vite quand quelque chose ne va pas.",
     pieges: []
   },
   {
-    num: 13, title: "Difficultés rencontrées → solutions", orateur: "Ianis", time: "1:30",
+    num: 12, title: "Difficultés rencontrées → solutions", orateur: "Ianis", time: "1:30",
     ecran: "Le pivot de cadrage : ambiguïté grossiste / 3PL → postulat assumé.",
     dire: "Voici la difficulté que je vous annonçais. Le sujet est ambigu : « PME logistique » avec « séparation des données par client », ça peut se lire de deux façons. Soit NTL est un grossiste, qui gère son propre stock. Soit c'est un prestataire logistique, qui héberge le stock de ses clients — ce qu'on appelle du 3PL. Et ces deux lectures mènent à des modèles très différents. Plutôt que de rester dans le flou, on a tranché : on a posé un postulat explicite — grossiste — et on l'a tracé dans une décision, l'ADR numéro 3. C'est une démarche d'itération maîtrisée, pas du tâtonnement. Conséquence assumée : l'isolation multi-tenant est reportée en V2. Et je veux être transparent avec vous : le DDL n'a pas encore été exécuté sur une vraie instance — c'est notre première perspective, ce n'est pas quelque chose qu'on cache.",
     pieges: [
@@ -249,13 +243,13 @@ const slides = [
     ]
   },
   {
-    num: 14, title: "Résultats & perspectives V2", orateur: "Blaise", time: "1:30",
+    num: 13, title: "Résultats & perspectives V2", orateur: "Blaise", time: "1:30",
     ecran: "Ce qui est livré, les chiffres-clés, la roadmap V2.",
     dire: "Pour les résultats : on livre huit livrables qui couvrent l'intégralité du cahier des charges. En chiffres : huit tables en troisième forme normale, une architecture qui tient le temps de reprise d'une heure et la perte maximale de quinze minutes, trois serveurs de base, cinq indicateurs de supervision, six décisions tracées. Et chaque limite qu'on a posée renvoie à une décision documentée — jamais à un oubli. Nos perspectives V2 sont claires : d'abord exécuter le DDL sur une instance, ensuite le multi-tenant si NTL bascule vers du 3PL, puis la gestion des lots et des dates de péremption, les expéditions, et la réplication synchrone. On a livré un socle solide — un MVP industrialisable, pas une maquette.",
     pieges: []
   },
   {
-    num: 15, title: "Conclusion", orateur: "Toute l'équipe", time: "0:30",
+    num: 14, title: "Conclusion", orateur: "Toute l'équipe", time: "0:30",
     ecran: "Synthèse + fil rouge + ouverture questions.",
     dire: "Pour conclure : on a conçu une base WMS pensée pour être sûre, supervisée et résiliente — un socle industrialisable. Et s'il fallait retenir une seule chose de notre démarche : face à un sujet ambigu, on a tranché par un postulat assumé et tracé, plutôt que de rester dans le flou. Merci de votre attention — nous sommes à votre disposition pour vos questions.",
     pieges: []
